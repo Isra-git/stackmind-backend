@@ -12,7 +12,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # configuramos el hashing para las contraseñas
-pwd_context=CryptContext(schemes=["bycrpt"], deprecated="auto")
+pwd_context=CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 SECRET_KEY = os.getenv("JWT_SECRET")
 ALGORITHM = os.getenv("ALGORITHM")
