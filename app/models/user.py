@@ -12,7 +12,7 @@ class User(Base):
     hashed_password = Column(String, nullable=False)
     
     # Datos de perfil para StackMind
-    username = Column(String, unique=True, index=True, nullable=False) # El alias, obligatorio y único
+    username = Column(String, unique=True, index=True, nullable=False) # alias obligatorio y único
     full_name = Column(String, nullable=True) # Nombre real, puede estar vacío
     avatar_url = Column(String, nullable=True) # URL de la imagen en Supabase Storage
     
