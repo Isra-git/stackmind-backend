@@ -4,7 +4,7 @@ Gestionamos las contraseñas y los tokens
 """
 
 from passlib.context import CryptContext
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from jose import jwt
 import os 
 from dotenv import load_dotenv
@@ -32,10 +32,10 @@ def create_access_token(data: dict, expires_delta: timezone=None):
     
     # comprobamos si se paso un tiempo de expiracion especifico
     if expires_delta:
-        expire=datetime.utcnow()+expires_delta
+        expire=datetime.now(timezone.utc)+expires_delta
     else:
         #si no se pasa, le damos 15 minutos
-        expire=datetime.utcnow()+timezone(minutes=15)
+        expire=datetime.now(timezone.utc)+timedelta(minutes=15)
     
     # añadimos la fecha de expiracion del token
     to_encode.update({"exp":expire})
