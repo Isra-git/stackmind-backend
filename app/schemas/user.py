@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Field
 from datetime import datetime
 from typing import Optional # <-- Necesario para los campos opcionales
 
@@ -9,7 +9,7 @@ class UserBase(BaseModel):
     avatar_url: Optional[str] = None # Opcional, por defecto es None
 
 class UserCreate(UserBase):
-    password: str 
+    password: str= Field(..., max_length=50) 
 
 class UserResponse(UserBase):
     id: int

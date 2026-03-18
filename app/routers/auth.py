@@ -5,9 +5,9 @@
 # importamos las dependencias
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from ..database import get_db
-from ..schemas.user import UserCreate, UserResponse
-from ..crud import user as crud_user
+from app.core.database import get_db
+from app.schemas.user import UserCreate, UserResponse
+from app.crud import user as crud_user
 
 # Creamos la instancia de APIRouter
 router = APIRouter()
