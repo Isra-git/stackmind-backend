@@ -14,6 +14,6 @@ class Question(Base):
     id = Column(Integer, primary_key=True, index=True)
     title = Column(String(200), nullable=False)
     body = Column(Text, nullable=False) # Aquí entrará el Base64 o el HTML limpio
-    
+    views = Column(Integer, default=1, nullable=False)
     author_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())

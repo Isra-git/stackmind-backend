@@ -18,7 +18,7 @@ router = APIRouter()
 
 
 # definimos la ruta de Registro de usuarios
-@router.post("/register", response_model=UserResponse)
+@router.post("/register", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
 def register_user(user: UserCreate, db: Session = Depends(get_db)):
     # comprobamos si existe el usuario
     db_user=crud_user.get_user_by_email(db, email=user.email)
