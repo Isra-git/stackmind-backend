@@ -1,12 +1,12 @@
 from pydantic import BaseModel, EmailStr, Field
 from datetime import datetime
-from typing import Optional # <-- Necesario para los campos opcionales
+from typing import Optional #para los campos opcionales
 
 class UserBase(BaseModel):
     email: EmailStr
     username: str # Obligatorio
-    full_name: Optional[str] = None # Opcional, por defecto es None
-    avatar_url: Optional[str] = None # Opcional, por defecto es None
+    full_name: Optional[str] = None # Opcional
+    avatar_url: Optional[str] = None # Opcional
 
 class UserCreate(UserBase):
     password: str= Field(..., max_length=50) 
