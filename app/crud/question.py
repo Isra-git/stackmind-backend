@@ -28,3 +28,13 @@ def create_question(db: Session, question: QuestionCreate, user_id: int):
     db.refresh(db_question)
     
     return db_question
+
+
+# Funcion que lee  las preguntas: mas recientes ordenadas por create_at Desc.
+def get_questions(db: Session, skip: int = 0, limit: int = 100):
+    return db.query(Question).order_by(Question.created_at.desc()).offset(skip).limit(limit).all()
+
+
+# Funcion que busca y devuelve una pregunta por el Id
+def get_question(db: Session, question_id: int):
+    return db.query(Question).filter(Question.id==question_id).first()
