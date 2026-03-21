@@ -3,7 +3,7 @@ Modelo de datos de Respuestas
 
 """
 
-from sqlalchemy import Column, Integer, Text, DateTime, ForeignKey, JSON 
+from sqlalchemy import Column, Integer, Text, DateTime, ForeignKey
 from sqlalchemy.sql import func
 from app.core.database import Base
 
@@ -13,8 +13,8 @@ class Answer(Base):
     id = Column(Integer, primary_key=True, index=True)
     body = Column(Text, nullable=False) # respuesta
     
-    # Para la lista para el Timeline de daisyUI
-    steps = Column(JSON, nullable=True) 
+    # Concepto principal de la Respuesta
+    main_concept = Column(Text, nullable=True)
     
     rating = Column(Integer, nullable=True) 
     created_at = Column(DateTime(timezone=True), server_default=func.now())
