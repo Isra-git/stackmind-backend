@@ -35,5 +35,6 @@ def create_new_answer(question_id:int,answer: AnswerCreate ,db: Session = Depend
 
 # endPoint para listar todas las Respuestas de una Pregunta (Publica)
 @router.get("/question/{question_id}", response_model=List[AnswerResponse],status_code=status.HTTP_200_OK)
-def read_answers_from_question(question_id: int, db: Session = Depends(get_db)):
-    return crud_answer.get_answers_by_question(db=db, question_id=question_id)
+def read_answers_from_question(question_id: int,skip:int =0 , limit:int =100 , db: Session = Depends(get_db)):
+    answer_for_question = crud_answer.get_answers_by_question(db=db, question_id=question_id)
+    return answer_for_question

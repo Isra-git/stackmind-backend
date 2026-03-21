@@ -32,9 +32,10 @@ def create_question(db: Session, question: QuestionCreate, user_id: int):
 
 # Funcion que lee  las preguntas: mas recientes ordenadas por create_at Desc.
 def get_questions(db: Session, skip: int = 0, limit: int = 100):
-    return db.query(Question).order_by(Question.created_at.desc()).offset(skip).limit(limit).all()
-
+    recent_question = db.query(Question).order_by(Question.created_at.desc()).offset(skip).limit(limit).all()
+    return recent_question
 
 # Funcion que busca y devuelve una pregunta por el Id
 def get_question(db: Session, question_id: int):
-    return db.query(Question).filter(Question.id==question_id).first()
+    question_by_id = db.query(Question).filter(Question.id==question_id).first()
+    return question_by_id

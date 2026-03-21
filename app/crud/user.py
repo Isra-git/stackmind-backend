@@ -11,8 +11,8 @@ from app.core.security import get_password_hash
 
 # buscamos si ya existe un User con ese email
 def get_user_by_email(db: Session, email: str):
-    return db.query(User).filter(User.email==email).first()
-
+    user_by_email = db.query(User).filter(User.email==email).first()
+    return user_by_email
 
 # creamos User con passw haseada
 def create_user(db: Session, user: UserCreate):

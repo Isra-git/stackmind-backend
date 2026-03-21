@@ -30,7 +30,7 @@ def create_answer(db: Session, answer: AnswerCreate, user_id: int, question_id: 
     return db_answer
 
 #funcion que devuelve una lista de las Respuestas a una Pregunta por (question_id)
-def get_answers_by_question(db:Session,question_id: int):
-    return db.query(Answer).filter(Answer.question_id== question_id).order_by(Answer.created_at.asc()).all()
-
+def get_answers_by_question(db:Session,question_id: int, skip:int=0, limit:int=100):
+    answer_list = db.query(Answer).filter(Answer.question_id== question_id).order_by(Answer.created_at.asc()).offset(skip).limit(limit).all()
+    return answer_list
 
