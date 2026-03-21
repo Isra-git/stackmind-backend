@@ -8,8 +8,10 @@ from fastapi import FastAPI
 
 from app.core.database import engine, Base
 from app.models import user, question, answer
+
 from app.routers import auth
 from app.routers import questions
+from app.routers import answers
 
 # Creamos las tablas en supabase de los modelos 
 Base.metadata.create_all(bind=engine)
@@ -20,7 +22,7 @@ app = FastAPI(title="StackMind API by israDev")
 # conectamos los Ruters con la instancia de FastAPI
 app.include_router(auth.router, prefix="/auth", tags=["Authentication"])
 app.include_router(questions.router, prefix="/questions", tags=["Questions"])
-
+app.include_router(answers.router, prefix="/answers", tags=["Answers"])
 
 
 """ 

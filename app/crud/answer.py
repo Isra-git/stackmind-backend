@@ -2,6 +2,8 @@
 Funciones para crear una respuesta, listar todas las respuestas
 
 """
+# app/crud/answers.py
+
 # dependencias
 from sqlalchemy.orm import Session
 
@@ -26,3 +28,9 @@ def create_answer(db: Session, answer: AnswerCreate, user_id: int, question_id: 
     db.refresh(db_answer)
     
     return db_answer
+
+#funcion que devuelve una lista de las Respuestas a una Pregunta por (question_id)
+def get_answers_by_question(db:Session,question_id: int):
+    return db.query(Answer).filter(Answer.question_id== question_id).order_by(Answer.created_at.asc()).all()
+
+
