@@ -5,6 +5,7 @@ Modelo de datos de Respuestas
 
 from sqlalchemy import Column, Integer, Text, DateTime, ForeignKey
 from sqlalchemy.sql import func
+from sqlalchemy.orm import relationship
 from app.core.database import Base
 
 class Answer(Base):
@@ -20,3 +21,7 @@ class Answer(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     author_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     question_id = Column(Integer, ForeignKey("questions.id"), nullable=False)
+    
+    # creamos la relacion con las Respuestas para eliminarlas cuando la pregunta sea eliminada
+    question = relationship("Question", back_populates="answers")
+    

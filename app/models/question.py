@@ -6,6 +6,7 @@ Modelo de datos de Preguntas
 # app/models/question.py 
 from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey
 from sqlalchemy.sql import func
+from sqlalchemy.orm import relationship
 from app.core.database import Base
 
 class Question(Base):
@@ -17,3 +18,6 @@ class Question(Base):
     views = Column(Integer, default=1, nullable=False)
     author_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
+    
+    # Borrado en cascada de las Respuestas cuando se borra una Pregunta
+    answers = relationship("Answer", back_populates="question", cascade="all, delete-orphan")
