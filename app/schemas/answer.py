@@ -14,13 +14,12 @@ class AnswerBase(BaseModel):
     main_concept: Optional[str]= Field(default=None, max_length=60)
 
 # Lo que el usuario envía desde el formulario de React
-class AnswerCreate(BaseModel):
+class AnswerCreate(AnswerBase):
     pass
 
 # Lo que enviamos a React para mostrar la pantalla
-class AnswerResponse(BaseModel):
+class AnswerResponse(AnswerBase):
     id: int
-    body: str
     rating: Optional[int] = 0
     created_at: datetime
     author_id: int

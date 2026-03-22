@@ -1,4 +1,4 @@
-"""  
+"""
 
 EndPoint  Respuestas
 
@@ -17,24 +17,59 @@ from app.core.security import get_current_user
 from app.models.user import User
 
 # instancia del Router
-router = APIRouter
+router = APIRouter()
+
 
 # endPoint para publicar una Respuesta (Protegida)
-@router.post("/question/{question_id}",response_model=AnswerResponse,status_code=status.HTTP_201_CREATED)
-def create_new_answer(question_id:int,answer: AnswerCreate ,db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
-    
+@router.post(
+    "/question/{question_id}",
+    response_model=AnswerResponse,
+    status_code=status.HTTP_201_CREATED,
+)
+def create_new_answer(
+    question_id: int,
+    answer: AnswerCreate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+
     # comprobamos que existe la pregunta
     question = crud_question.get_question(db=db, question_id=question_id)
     if not question:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="La pregunta que intentas responder no existe")
-    
-    # si existe la pregunta, guardamos la respuesta
-    return crud_answer.create_answer(db=db, answer= answer, user_id=current_user.id, question_id=question_id)
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="La pregunta que intentas responder no existe",
+        )
 
+    # si existe la pregunta, guardamos la respuesta
+    return crud_answer.create_answer(
+        db=db, answer=answer, user_id=current_user.id, question_id=question_id
+    )
 
 
 # endPoint para listar todas las Respuestas de una Pregunta (Publica)
-@router.get("/question/{question_id}", response_model=List[AnswerResponse],status_code=status.HTTP_200_OK)
-def read_answers_from_question(question_id: int,skip:int =0 , limit:int =100 , db: Session = Depends(get_db)):
-    answer_for_question = crud_answer.get_answers_by_question(db=db, question_id=question_id)
+@router.get(
+    "/question/{question_id}",
+    response_model=List[AnswerResponse],
+    status_code=status.HTTP_200_OK,
+)
+def read_answers_from_question(
+    question_id: int, skip: int = 0, limit: int = 100, db: Session = Depends(get_db)
+):
+    # comprobamos que la pregunta existe
+    question = crud_question.get_question(db, question_id=question_id)
+    if not question:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="La pregunta que intentas responder no existe",
+        )
+    
+    # si existe devolvemos List [AnswerResponse]
+    answer_for_question = crud_answer.get_answers_by_question(
+        db=db, 
+        question_id=question_id,
+        skip=skip,
+        limit=limit
+    )
+
     return answer_for_question
