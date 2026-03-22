@@ -10,7 +10,7 @@ mas recientes, buscar una pregunta por su id
 # dependencias
 from sqlalchemy.orm import Session
 from app.models.question import Question
-from app.schemas.question import QuestionCreate
+from app.schemas.question import QuestionCreate, QuestionUpdate
 
 
 # Funcion que crea y guarda la pregunta del usuario
@@ -43,3 +43,30 @@ def get_questions(db: Session, skip: int = 0, limit: int = 100):
 def get_question(db: Session, question_id: int):
     question_by_id = db.query(Question).filter(Question.id == question_id).first()
     return question_by_id
+
+
+# Funcion para Editar una Pregunta
+def update_question(db: Session, db_question: Question, question_input: QuestionUpdate):
+    
+    # scamos de Json solo los datos que el usuario ha -Enviado-
+    update_data= question_input.model_dump(exclude_unset=True) # aqui sacamos solo lo enviado
+    
+    # actualizamos el objeto para la Bd campo x campo (solo los que edito)
+    for key, value in update_data.items():
+        setattr(db_question, key, value)
+    
+    # guardamos los cambios en Db
+    db.add(db_question)
+    db.commit()
+    db.refresh(db_question)
+    return db_question
+
+# Funcion para Eliminar una Pregunta
+def delete_question(db:Session, db_question: Question):
+    
+    db.delete(db_question)
+    db.commit()
+    return db_question
+
+    
+    

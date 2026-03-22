@@ -7,6 +7,7 @@ Schemas para Preguntas
 # app/schemas/question.py
 from pydantic import BaseModel
 from datetime import datetime
+from typing import Optional
 
 #  propiedades básicas que siempre tendrá una pregunta
 class QuestionBase(BaseModel):
@@ -26,6 +27,14 @@ class QuestionResponse(QuestionBase):
     views: int
     created_at: datetime
     author_id: int # Para saber quién es el dueño y dejarle puntuar las respuestas
+
+
+# esquema para el modo edicion
+class QuestionUpdate(BaseModel):
+    title: Optional[str] = None
+    body: Optional[str] = None
+    
+    
 
     class Config:
         from_attributes = True

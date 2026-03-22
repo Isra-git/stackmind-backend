@@ -11,7 +11,7 @@ from sqlalchemy.orm import Session
 from typing import List
 
 from app.core.database import get_db
-from app.schemas.question import QuestionCreate, QuestionResponse
+from app.schemas.question import QuestionCreate, QuestionResponse, QuestionUpdate
 from app.crud import question as crud_question
 from app.core.security import get_current_user
 from app.models.user import User
@@ -52,3 +52,63 @@ def read_question(question_id: int, db: Session = Depends(get_db)):
 
     # devolvemos la pregunta
     return db_question
+
+
+# endPoint para actualizar una Pregunta en la bd (Solo el Autor)
+@router.put(
+    "/{question_id}", response_model=QuestionResponse, status_code=status.HTTP_200_OK
+)
+def update_question(
+    question_id: int,
+    question_input: QuestionUpdate,
+    db: Session = Depends(get_db) ,
+    current_user: User = Depends(get_current_user),
+):
+    # comprobamos que existe la pregunta
+    db_question = crud_question.get_question(db, question_id=question_id)
+    if not db_question:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="La pregunta que intentas borrar no existe",
+        )
+
+    # comprobamos que es el Propietario de la pregunta
+    if db_question.author_id != current_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Solo el autor puede actualizar esta pregunta",
+        )
+
+    # si existe y es el propietario Actualizamos
+    return crud_question.update_question(
+        db=db, db_question=db_question, question_input=question_input
+    )
+
+
+
+# endPoint para Borrar una Pregutna (solo el autor)
+@router.delete("/{question_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_question(
+    question_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    # comprobamos que la pregunta existe
+    db_question = crud_question.get_question(db, question_id=question_id)
+    if not db_question:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Pregunta no encontrada",
+        )
+    
+    # comprobamos que es el Propietario de la Pregunta
+    if db_question.author_id!= current_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="No tienes permiso para borrar esta pregunta"
+        )
+    
+    # borramos la pregunta
+    crud_question.delete_question(db, db_question)
+
+    return None
