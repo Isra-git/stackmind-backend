@@ -10,7 +10,7 @@ from fastapi import APIRouter, Depends, status, HTTPException
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
-from app.schemas.answer import AnswerCreate, AnswerResponse
+from app.schemas.answer import AnswerCreate, AnswerResponse, AnswerUpdate
 from app.crud import answer as crud_answer
 from app.crud import question as crud_question
 from app.core.security import get_current_user
@@ -73,3 +73,64 @@ def read_answers_from_question(
     )
 
     return answer_for_question
+
+
+
+# endPoint para Actualizar una Respuesta
+@router.put(
+    "/{answer_id}",
+    response_model=AnswerResponse,
+    status_code=status.HTTP_200_OK
+)
+def update_answer(
+    answer_id: int,
+    answer_input: AnswerUpdate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    
+    # comprobamos que la Respuesta Existe
+    db_answer=crud_answer.get_answer(db, answer_id=answer_id)
+    if not db_answer:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="La respuesta que intentas borrar no existe"
+        )
+
+    # comprobamos que es el Propietario de la Respuesta
+    if db_answer.author_id != current_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="No tienes permiso para editar la respuesta"
+        )
+    
+    # Si existe y es el Propietario de la Respuesta la actualizamos
+    return crud_answer.update_answer(db=db, db_answer=db_answer, answer_update=answer_input)
+
+
+# endPoint para eliminar una respuesta
+@router.delete("/{answer_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_answer(
+    answer_id:int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    # comprobamos que la Respuesta existe
+    db_answer = crud_answer.get_answer(db=db, answer_id=answer_id)
+    if not db_answer:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Respuesta no encontrada"
+        )
+    
+    # comprobamos que es el Popietario de la Respuesta
+    if db_answer.author_id != current_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="No tienes permiso para eliminar la respuesta"
+        )
+    
+    # borramos la Respuesta
+    crud_answer.delete_answer(db, db_answer)
+    
+    return None

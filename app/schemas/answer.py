@@ -25,5 +25,14 @@ class AnswerResponse(AnswerBase):
     author_id: int
     question_id: int
 
+
+# Lo que enviamos y comprobamos al actualizar una pregunta
+class AnswerUpdate(AnswerBase):
+    body: Optional[str] = None
+    main_concept: Optional[str]= Field(default=None, max_length=60)
+
+
+
+# Configuración de Pydantic para manejar los campos como atributos directamente
     class Config:
         from_attributes = True

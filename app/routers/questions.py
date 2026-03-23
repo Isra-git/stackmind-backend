@@ -61,7 +61,7 @@ def read_question(question_id: int, db: Session = Depends(get_db)):
 def update_question(
     question_id: int,
     question_input: QuestionUpdate,
-    db: Session = Depends(get_db) ,
+    db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
     # comprobamos que existe la pregunta
@@ -85,13 +85,12 @@ def update_question(
     )
 
 
-
 # endPoint para Borrar una Pregutna (solo el autor)
 @router.delete("/{question_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_question(
     question_id: int,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(get_current_user),
 ):
     # comprobamos que la pregunta existe
     db_question = crud_question.get_question(db, question_id=question_id)
@@ -100,14 +99,14 @@ def delete_question(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Pregunta no encontrada",
         )
-    
+
     # comprobamos que es el Propietario de la Pregunta
-    if db_question.author_id!= current_user.id:
+    if db_question.author_id != current_user.id:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="No tienes permiso para borrar esta pregunta"
+            detail="No tienes permiso para borrar esta pregunta",
         )
-    
+
     # borramos la pregunta
     crud_question.delete_question(db, db_question)
 
