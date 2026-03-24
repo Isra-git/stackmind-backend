@@ -12,6 +12,7 @@ from app.models import user, question, answer
 from app.routers import auth
 from app.routers import questions
 from app.routers import answers
+from app.routers import users
 
 # Creamos las tablas en supabase de los modelos 
 Base.metadata.create_all(bind=engine)
@@ -23,7 +24,7 @@ app = FastAPI(title="StackMind API by israDev")
 app.include_router(auth.router, prefix="/auth", tags=["Authentication"])
 app.include_router(questions.router, prefix="/questions", tags=["Questions"])
 app.include_router(answers.router, prefix="/answers", tags=["Answers"])
-
+app.include_router(users.router, prefix="/users", tags=["Users"])
 
 """ 
     ENDPOINTS

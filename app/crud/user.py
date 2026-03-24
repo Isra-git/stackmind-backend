@@ -35,3 +35,28 @@ def create_user(db: Session, user: UserCreate):
     db.refresh(db_user)
     
     return db_user
+
+
+# Funcion para dar de baja (is_active:False) a un User
+def soft_delete_user(db: Session, db_user: User):
+    
+    # Sobreescribimos Todos sus datos
+    db_user.email = f"deleted_user{db_user.id}@stackmind.mock",
+    db_user.username = f"deleted_uuser{db_user.id}",
+    db_user.full_name = "Deleted User",
+    db_user.avatar_url = None,
+    db_user.hashed_password = "disables_account",
+    
+    # lo damos de baja ( is_active:false)
+    db_user.is_active = False
+    
+    # guardamos los cambios
+    db.add(db_user)
+    db.commit()
+    db.refresh(db_user)
+    
+    # devolvemos los mock__datos del usuario dado de baja
+    return db_user
+
+# Funcion para Modificar los datos de un User
+#def update_user(db: Session, db_user: User, user_update: UpdateUser):
