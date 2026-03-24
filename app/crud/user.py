@@ -6,7 +6,7 @@ su email o actualizar los puntos de respuesta
 # app/crud/user.py
 from sqlalchemy.orm import Session
 from app.models.user import User
-from app.schemas.user import UserCreate
+from app.schemas.user import UserCreate,UserUpdate
 from app.core.security import get_password_hash
 
 # buscamos si ya existe un User con ese email
@@ -58,5 +58,26 @@ def soft_delete_user(db: Session, db_user: User):
     # devolvemos los mock__datos del usuario dado de baja
     return db_user
 
+# funcion para buscar si un Alias ya esta usado
+def get_user_by_username(db: Session, username:str):
+    user_is_used=db.query(User).filter(User.username== username).first()
+    return user_is_used
+
 # Funcion para Modificar los datos de un User
-#def update_user(db: Session, db_user: User, user_update: UpdateUser):
+def update_user(db: Session, db_user: User, user_update: UserUpdate):
+    
+    # sacamos los datos en Json que ha cambiado
+    update_data = user_update.model_dump(exclude_unset=True)
+    
+    # actualizamos los campos del usuario
+    for key, value in update_data.items():
+        setattr(db_user, key, value)
+    
+    # guardamos los datos del usuario
+    db.add(db_user)
+    db.commit()
+    db.refresh(db_user)
+
+    # devolvemos los nuevos datos del usuario
+    return db_user
+    
