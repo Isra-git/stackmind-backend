@@ -34,7 +34,7 @@ def create_new_question(
 
 # endPoint para leer preguntas (acceso publico)
 @router.get("/", response_model=List[QuestionResponse])
-def read_questions(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+def read_questions(skip: int = 0, limit: int = 20, db: Session = Depends(get_db)):
     questions = crud_question.get_questions(db, skip=skip, limit=limit)
     return questions
 

@@ -54,7 +54,7 @@ def create_new_answer(
     status_code=status.HTTP_200_OK,
 )
 def read_answers_from_question(
-    question_id: int, skip: int = 0, limit: int = 100, db: Session = Depends(get_db)
+    question_id: int, skip: int = 0, limit: int = 10, db: Session = Depends(get_db)
 ):
     # comprobamos que la pregunta existe
     question = crud_question.get_question(db, question_id=question_id)
