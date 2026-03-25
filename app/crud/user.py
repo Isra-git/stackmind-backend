@@ -41,12 +41,11 @@ def create_user(db: Session, user: UserCreate):
 def soft_delete_user(db: Session, db_user: User):
     
     # Sobreescribimos Todos sus datos
-    db_user.email = f"deleted_user{db_user.id}@stackmind.mock",
-    db_user.username = f"deleted_uuser{db_user.id}",
-    db_user.full_name = "Deleted User",
-    db_user.avatar_url = None,
-    db_user.hashed_password = "disables_account",
-    
+    db_user.email = f"deleted_user{db_user.id}@stackmind.mock"
+    db_user.username = f"deleted_uuser{db_user.id}"
+    db_user.full_name = "Deleted User"
+    db_user.avatar_url = None
+    db_user.hashed_password = "disables_account"
     # lo damos de baja ( is_active:false)
     db_user.is_active = False
     
