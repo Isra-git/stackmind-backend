@@ -16,11 +16,13 @@ class UserResponse(UserBase):
     reputation: int
     is_active: bool
     created_at: datetime
+    
+    class Config:
+        from_attributes = True
 
 class UserUpdate(BaseModel):
     username: Optional[str]= None
     full_name: Optional[str]= None
     avatar_url: Optional[str]= None
 
-    class Config:
-        from_attributes = True
+   

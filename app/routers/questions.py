@@ -39,7 +39,25 @@ def read_questions(skip: int = 0, limit: int = 20, db: Session = Depends(get_db)
     return questions
 
 
+# endPoint para el Buscador de preguntas -No bajar la ruta "/search" ¡¡
+@router.get("/search", response_model=List[QuestionResponse])
+def search_questions(
+    query: str,
+    skip: int =0,
+    limit: int = 0,
+    db: Session = Depends(get_db)
+):
+    # ejecutamos la busqueda y la guardamos en una lista
+    questions = crud_question.search_questions(db=db, search_query=query, skip=skip, limit=limit)
+    
+    # devolvemos la lista de preguntas
+    return questions
+
+
+
 # endPoint para ver una pregunta por su id (acceso publico)
+#    CAMBIADO DEBAJO DE /search, por orden de rutas de FastAPI (Error 422¡)
+#    No mover¡¡
 @router.get("/{question_id}", response_model=QuestionResponse)
 def read_question(question_id: int, db: Session = Depends(get_db)):
     db_question = crud_question.get_question(db, question_id=question_id)
