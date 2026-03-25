@@ -9,6 +9,7 @@ mas recientes, buscar una pregunta por su id
 
 # dependencias
 from sqlalchemy.orm import Session
+import re
 
 # from sqlalchemy import func, or_
 from sqlalchemy import text
@@ -113,35 +114,39 @@ def search_questions(db: Session, search_query: str, skip: int = 0, limit: int =
     ---------------- tampoco funciona, problemas del traductor con supabase----
 
     """
+    # Limpiamos la entrada para evitar errores de sintaxis en PostgreSQL
+    # Solo dejamos letras, números y espacios
+    clean_query = re.sub(r'[^\w\s]', '', search_query).strip()
+    
+    # Si la búsqueda se queda vacía tras limpiar, devolvemos lista vacía
+    if not clean_query:
+        return []
 
-    # consulta en Sql puro para evitar problemas con supabase PostgreSql
-    # # title tiene mas peso(setweight) que body -> Une el título y el texto en un solo bloque
+    #  Convertimos "como usar preg" en "como:* & usar:* & preg:*"
+    # * indica prefijo. Postgres buscará en el índice GIN lexemas que EMPIECEN por esas letras.
+    tsquery_string = " & ".join([f"{word}:*" for word in clean_query.split()])
+
+    # Consulta SQL usando to_tsquery (que soporta los comodines :*)
     sql_search = text("""
-(
-  setweight(to_tsvector('spanish', coalesce(title, '')), 'A')
-  ||
-  setweight(to_tsvector('spanish', coalesce(body, '')), 'B')
-) @@ plainto_tsquery('spanish', :search_term)
-""")
+        search_vector @@ to_tsquery('spanish', :search_term)
+    """)
 
-rank_expr = text("""
-ts_rank_cd(
-  setweight(to_tsvector('spanish', coalesce(title, '')), 'A')
-  ||
-  setweight(to_tsvector('spanish', coalesce(body, '')), 'B'),
-  plainto_tsquery('spanish', :search_term)
-) DESC
-""")
+    # Fórmula de ranking para ordenar los resultados (Título pesa más que el cuerpo)
+    rank_expr = text("""
+        ts_rank_cd(search_vector, to_tsquery('spanish', :search_term)) DESC
+    """)
 
-results = (
-    db.query(Question)
-    .filter(sql_search)
-    .params(search_term=search_query)
-    .order_by(rank_expr)
-    .offset(skip)
-    .limit(limit)
-    .all()
-)
+    # Ejecutamos la consulta
+    results = (
+        db.query(Question)
+        .filter(sql_search)
+        .params(search_term=tsquery_string)
+        .order_by(rank_expr)
+        .offset(skip)
+        .limit(limit)
+        .all()
+    )
+    return results
 
-    # devolvemos los resultados de la busqueda
+    # devolvemos la lista de  resultados de la busqueda
     return results
