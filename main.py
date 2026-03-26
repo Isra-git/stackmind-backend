@@ -13,6 +13,7 @@ from app.routers import auth
 from app.routers import questions
 from app.routers import answers
 from app.routers import users
+from app.routers import ai
 
 # Creamos las tablas en supabase de los modelos 
 Base.metadata.create_all(bind=engine)
@@ -25,6 +26,8 @@ app.include_router(auth.router, prefix="/auth", tags=["Authentication"])
 app.include_router(questions.router, prefix="/questions", tags=["Questions"])
 app.include_router(answers.router, prefix="/answers", tags=["Answers"])
 app.include_router(users.router, prefix="/users", tags=["Users"])
+app.include_router(ai.router, prefix="/ai", tags=["Artificial Intelligence"])
+
 
 """ 
     ENDPOINTS
