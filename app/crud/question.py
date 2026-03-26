@@ -79,13 +79,10 @@ def delete_question(db: Session, db_question: Question):
 
 # Funcion para Buscar Preguntas , usando [Full-Text Search ] de PostreSQL en castellano
 def search_questions(db: Session, search_query: str, skip: int = 0, limit: int = 20):
-    # parseamos la frase a buscar a formate de busqueda Postgr en castellano
-    # search_format = func.plainto_tsquery('spanish', search_query)
-
-    # realizamos la busqueda (en titulo +  cuerpo ) de la Pregunta
+   
     """
         CONCEPTO DE FULL-TEXT SEARCH de PostgreSQL
-        https://www.postgresql.org/docs/current/textsearch-intro.html
+    
 
     or_ -> Or Logico -> En titulo o en Cuerpo
     to_tsvector -> transforma el texto a un vector de palabras
@@ -96,28 +93,11 @@ def search_questions(db: Session, search_query: str, skip: int = 0, limit: int =
              -> El vector hace Match o "Encaja con"
     ----------
 
-    results = db.query(Question).filter(
-        or_(
-            func.to_tsvector('spanish', Question.title).op('@@')(search_format),
-            func.to_tsvector('spanish', Question.body).op('@@')(search_format)
-        )
-    ).order_by(Question.created_at.desc()).offset(skip).limit(limit).all()
-        -------------------- Probado NO funciona¡----------
-
-    results = db.query(Question).filter(
-        or_(
-            Question.title.match(search_query, postgresql_regconfig='spanish'),
-            Question.body.match(search_query, postgresql_regconfig='spanish')
-        )
-    ).order_by(Question.created_at.desc()).offset(skip).limit(limit).all()
-
-    ---------------- tampoco funciona, problemas del traductor con supabase----
-
     """
     # Limpiamos la entrada para evitar errores de sintaxis en PostgreSQL
     # Solo dejamos letras, números y espacios
-    clean_query = re.sub(r'[^\w\s]', '', search_query).strip()
-    
+    clean_query = re.sub(r"[^\w\s]", "", search_query).strip()
+
     # Si la búsqueda se queda vacía tras limpiar, devolvemos lista vacía
     if not clean_query:
         return []
