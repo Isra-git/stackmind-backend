@@ -10,7 +10,7 @@ from fastapi import APIRouter, Depends, status, HTTPException
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
-from app.schemas.answer import AnswerCreate, AnswerResponse, AnswerUpdate
+from app.schemas.answer import AnswerCreate, AnswerResponse, AnswerUpdate, AnswerVote
 from app.crud import answer as crud_answer
 from app.crud import question as crud_question
 from app.core.security import get_current_user
@@ -63,74 +63,121 @@ def read_answers_from_question(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="La pregunta que intentas responder no existe",
         )
-    
+
     # si existe devolvemos List [AnswerResponse]
     answer_for_question = crud_answer.get_answers_by_question(
-        db=db, 
-        question_id=question_id,
-        skip=skip,
-        limit=limit
+        db=db, question_id=question_id, skip=skip, limit=limit
     )
 
     return answer_for_question
 
 
-
 # endPoint para Actualizar una Respuesta
 @router.put(
-    "/{answer_id}",
-    response_model=AnswerResponse,
-    status_code=status.HTTP_200_OK
+    "/{answer_id}", response_model=AnswerResponse, status_code=status.HTTP_200_OK
 )
 def update_answer(
     answer_id: int,
     answer_input: AnswerUpdate,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(get_current_user),
 ):
-    
+
     # comprobamos que la Respuesta Existe
-    db_answer=crud_answer.get_answer(db, answer_id=answer_id)
+    db_answer = crud_answer.get_answer(db, answer_id=answer_id)
     if not db_answer:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="La respuesta que intentas borrar no existe"
+            detail="La respuesta que intentas borrar no existe",
         )
 
     # comprobamos que es el Propietario de la Respuesta
     if db_answer.author_id != current_user.id:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="No tienes permiso para editar la respuesta"
+            detail="No tienes permiso para editar la respuesta",
         )
-    
+
     # Si existe y es el Propietario de la Respuesta la actualizamos
-    return crud_answer.update_answer(db=db, db_answer=db_answer, answer_update=answer_input)
+    return crud_answer.update_answer(
+        db=db, db_answer=db_answer, answer_update=answer_input
+    )
 
 
 # endPoint para eliminar una respuesta
 @router.delete("/{answer_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_answer(
-    answer_id:int,
+    answer_id: int,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(get_current_user),
 ):
     # comprobamos que la Respuesta existe
     db_answer = crud_answer.get_answer(db=db, answer_id=answer_id)
     if not db_answer:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Respuesta no encontrada"
+            status_code=status.HTTP_404_NOT_FOUND, detail="Respuesta no encontrada"
         )
-    
+
     # comprobamos que es el Popietario de la Respuesta
     if db_answer.author_id != current_user.id:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="No tienes permiso para eliminar la respuesta"
+            detail="No tienes permiso para eliminar la respuesta",
         )
-    
+
     # borramos la Respuesta
     crud_answer.delete_answer(db, db_answer)
-    
+
     return None
+
+
+# endPoint para Votar una Respuesta (protegido)
+@router.post(
+    "/{answer_id}/vote", response_model=AnswerResponse, status_code=status.HTTP_200_OK
+)
+def vote_answer(
+    answer_id: int,
+    vote: AnswerVote,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    # comprobamos que la Respuesta existe
+    db_answer = crud_answer.get_answer(db, answer_id)
+    if not db_answer:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="La Respuesta NO existe"
+        )
+
+    # evitamos que vote su propia pregunta
+    if db_answer.author_id == current_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="No puedes votar tu propia respuesta¡¡",
+        )
+
+    # Puntuacion
+    points = 0
+    if vote.score == 1:
+        points = -1
+    elif vote.score == 2:
+        points = 1
+    elif vote.score == 3:
+        points = 3
+    elif vote.score == 4:
+        points = 7
+
+    # actualizamos Rating Respuesta
+    rate = db_answer.rating or 0
+    db_answer.rating = rate + points
+
+    # actualizamos la reputacion del Author
+    author = db.query(User).filter(User.id == db_answer.author_id).first()
+    if author:
+        current_rating = author.reputation or 0
+        author.reputation = current_rating + points
+
+    # confirmamos y guardamos
+    db.commit()
+    db.refresh(db_answer)
+
+    return db_answer
