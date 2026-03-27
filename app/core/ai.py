@@ -6,7 +6,7 @@
 
 # dependencias
 import os
-from  google import genai
+from  groq import Groq
 from dotenv import load_dotenv
 
 # cogemos las variables de entorno
@@ -14,7 +14,7 @@ load_dotenv()
 
 
 # definimos modelo IA 
-client = genai.Client()
+client = Groq()
 
 # Funcion que coge el texto escrito por el Usuario y lo "refina"
 def enhance_text_with_AI(raw_text:str) -> str:
@@ -48,11 +48,19 @@ DEVUELVE ÚNICAMENTE el texto mejorado, sin introducciones, sin comillas, sin co
 Texto original del usuario:
 {raw_text}
 """
-
-    # llamamos a gemini
-    response = client.models.generate_content(
-        model='gemini-2.0-flash',
-        contents=prompt)
-
-    # limpiamos y devolvemos la Respuesta
-    return response.text.strip()
+# Uilizamos Llama 3 a través de Groq
+    completion = client.chat.completions.create(
+        model="llama-3.3-70b-versatile", # gran español
+        messages=[
+            {
+                "role": "user",
+                "content": prompt
+            }
+        ],
+        temperature=0.3, # Bajamos la temperatura para que sea más preciso y menos creativo
+    )
+    # formateamos la respuesta
+    response = completion.choices[0].message.content.strip()
+    
+    # devolvemos la Respuesta
+    return response

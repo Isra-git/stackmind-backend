@@ -33,7 +33,7 @@ def enhance_question(
         improved_text = enhance_text_with_AI(request.raw_text)
         
         # devolvemos Json con el texto "mejorado"
-        return {"enhanced_text", improved_text}
+        return {"enhanced_text": improved_text}
     
     except Exception as e:
         
