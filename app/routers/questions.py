@@ -67,6 +67,11 @@ def read_question(question_id: int, db: Session = Depends(get_db)):
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Pregunta no encontrada"
         )
+    
+    # actualizamos el Contador de Visitas
+    db_question.views+=1
+    db.commit()
+    db.refresh(db_question)
 
     # devolvemos la pregunta
     return db_question
