@@ -28,6 +28,10 @@ def register_user(user: UserCreate, db: Session = Depends(get_db)):
     if db_user:
         raise HTTPException(status_code=400, detail="El Email ya esta registrado")
 
+    db_username = crud_user.get_user_by_username(db, username=user.username)
+    if db_username:
+        raise HTTPException(status_code=400, detail="El nombre de usuario ya está en uso")
+    
     # sino-> Creamos el usuario en la db
     return crud_user.create_user(db=db, user=user)
 
