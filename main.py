@@ -5,6 +5,7 @@
 #main.py
 # importamos las dependencias
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.database import engine, Base
 from app.models import user, question, answer
@@ -20,6 +21,15 @@ Base.metadata.create_all(bind=engine)
 
 # Creamos la instancia de FastAPI
 app = FastAPI(title="StackMind API by israDev")
+
+# configuracion CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"], # todo -> Cambiar cuando tenga el front 
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"], # permitimos jwt
+)
 
 # conectamos los Ruters con la instancia de FastAPI
 app.include_router(auth.router, prefix="/auth", tags=["Authentication"])
