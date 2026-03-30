@@ -4,7 +4,7 @@ Schemas para Respuestas
 
 """
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 from datetime import datetime
 from typing import Optional
 
@@ -35,9 +35,7 @@ class AnswerUpdate(AnswerBase):
     main_concept: Optional[str] = Field(default=None, max_length=60)
 
     # Configuración de Pydantic para manejar los campos como atributos directamente
-    class Config:
-        from_attributes = True
-
+    model_config= ConfigDict(from_attributes = True)
 
 # Configuracion para recibir una Votacion de una Respuesta
 class AnswerVote(BaseModel):

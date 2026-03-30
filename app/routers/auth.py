@@ -7,12 +7,20 @@ ROUTER PARA AUTH / LOGIN
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from fastapi.security import OAuth2PasswordRequestForm
+import os
+from dotenv import load_dotenv
+from typing import List
 
 from app.core.database import get_db
 from app.schemas.user import UserCreate, UserResponse
 from app.crud import user as crud_user
 from app.core.security import verify_password, create_access_token, get_current_user
 from app.models.user import User
+
+
+# cargamos las variables de entorno
+load_dotenv()
+
 
 # Creamos la instancia de APIRouter
 router = APIRouter()
@@ -30,8 +38,10 @@ def register_user(user: UserCreate, db: Session = Depends(get_db)):
 
     db_username = crud_user.get_user_by_username(db, username=user.username)
     if db_username:
-        raise HTTPException(status_code=400, detail="El nombre de usuario ya está en uso")
-    
+        raise HTTPException(
+            status_code=400, detail="El nombre de usuario ya está en uso"
+        )
+
     # sino-> Creamos el usuario en la db
     return crud_user.create_user(db=db, user=user)
 
@@ -52,6 +62,13 @@ def login(
             headers={"www-authenticate": "bearer"},
         )
 
+    # comprobamos que el usuario no esta "desactivado"
+    if not user.is_active:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Esta cuenta ha sido desactivada, contacte con el administrador",
+        )
+
     # si todo es correcto, creamos el token Jwt
     acces_token = create_access_token(data={"sub": str(user.id)})
 
@@ -59,8 +76,21 @@ def login(
     return {"access_token": acces_token, "token_type": "bearer"}
 
 
+
+
+# Si el correo es el del admin -> is_admin:true
+ADMIN_EMAIL = os.getenv("ADMIN_EMAIL", "admin@stackmind.com")
+
 # definimos una ruta que devuelve los datos del usuario (models.User)
 # ruta Protegida
 @router.get("/me", response_model=UserResponse)
 def read_users_me(current_user: User = Depends(get_current_user)):
-    return current_user
+
+    # convertimos el objeto de la bd a un dict para poder modificarlo
+    user_data = current_user.__dict__
+
+    # comprobamos si es el admin
+    user_data["is_admin"] = current_user.email == ADMIN_EMAIL
+
+    return user_data
+

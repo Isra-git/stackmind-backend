@@ -8,6 +8,7 @@ EndPoint  Respuestas
 from typing import List
 from fastapi import APIRouter, Depends, status, HTTPException
 from sqlalchemy.orm import Session
+import os
 
 from app.core.database import get_db
 from app.schemas.answer import AnswerCreate, AnswerResponse, AnswerUpdate, AnswerVote
@@ -15,6 +16,12 @@ from app.crud import answer as crud_answer
 from app.crud import question as crud_question
 from app.core.security import get_current_user
 from app.models.user import User
+
+
+
+# email del ADmin
+ADMIN_EMAIL= os.getenv("ADMIN_EMAIL", "admin@stackmind.com")
+
 
 # instancia del Router
 router = APIRouter()
@@ -119,7 +126,7 @@ def delete_answer(
         )
 
     # comprobamos que es el Popietario de la Respuesta
-    if db_answer.author_id != current_user.id:
+    if db_answer.author_id != current_user.id and current_user.email != ADMIN_EMAIL:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="No tienes permiso para eliminar la respuesta",

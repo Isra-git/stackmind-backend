@@ -9,6 +9,7 @@ EndPoint Questions
 from fastapi import APIRouter, Depends, status, HTTPException
 from sqlalchemy.orm import Session
 from typing import List
+import os 
 
 from app.core.database import get_db
 from app.schemas.question import QuestionCreate, QuestionResponse, QuestionUpdate
@@ -19,6 +20,8 @@ from app.models.user import User
 # definimos el router
 router = APIRouter()
 
+# email del ADmin
+ADMIN_EMAIL= os.getenv("ADMIN_EMAIL", "admin@stackmind.com")
 
 # endPoint para crear una pregunta (solo para autenticados)
 @router.post("/", response_model=QuestionResponse, status_code=status.HTTP_201_CREATED)
@@ -123,8 +126,8 @@ def delete_question(
             detail="Pregunta no encontrada",
         )
 
-    # comprobamos que es el Propietario de la Pregunta
-    if db_question.author_id != current_user.id:
+    # comprobamos que es el Propietario de la Pregunta o no es el ADMIn
+    if db_question.author_id != current_user.id and current_user.email != ADMIN_EMAIL:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="No tienes permiso para borrar esta pregunta",

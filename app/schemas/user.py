@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr, Field, ConfigDict
 from datetime import datetime
 from typing import Optional #para los campos opcionales
 
@@ -16,13 +16,19 @@ class UserResponse(UserBase):
     reputation: int
     is_active: bool
     created_at: datetime
+    is_admin: bool = False
     
-    class Config:
-        from_attributes = True
+    model_config= ConfigDict(from_attributes = True)
 
 class UserUpdate(BaseModel):
     username: Optional[str]= None
     full_name: Optional[str]= None
     avatar_url: Optional[str]= None
 
+class UserLeaderboard(BaseModel):
+    username: str
+    avatar_url: Optional[str]= None
+    reputation: int
+   
+    model_config= ConfigDict(from_attributes = True)
    

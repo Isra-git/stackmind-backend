@@ -79,4 +79,50 @@ def update_user(db: Session, db_user: User, user_update: UserUpdate):
 
     # devolvemos los nuevos datos del usuario
     return db_user
+
+
+# funcion para Listar los usuarios ordenados por Rating Desc
+def get_all_users(
+    db: Session,
+    skip: int = 0,
+    limit: int = 100,
+):
+    # realizamos la consulta
+    users=db.query(User)\
+        .filter(User.is_active)\
+        .order_by(User.reputation.desc())\
+        .offset(skip)\
+        .limit(limit)\
+        .all()
     
+    # devolvemos la lista de usuarios
+    return users
+
+# Funcion que devuelve un Usuario por su ID
+def get_user(
+    db: Session,
+    user_id: int
+):
+    user = db.query(User).filter(User.id==user_id).first()
+    return user
+
+
+# Funcion que devuelve una lista completa de usuarios (para el ADMIn)
+def get_users(
+    db: Session,
+    skip: int = 0 ,
+    limit : int = 100
+):
+    users_list=db.query(User).offset(skip).limit(limit).all()
+    return users_list
+
+# Alterna el estado is_active de un Usuario
+def toogle_user_state(
+    db: Session,
+    db_user:User
+):
+    # invertimos el estado del booleano _is_active_
+    db_user.is_active = not db_user.is_active
+    db.commit()
+    db.refresh(db_user)
+    return db_user

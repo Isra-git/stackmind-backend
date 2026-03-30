@@ -5,7 +5,7 @@ Schemas para Preguntas
 """
 
 # app/schemas/question.py
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from datetime import datetime
 from typing import Optional
 
@@ -34,7 +34,6 @@ class QuestionUpdate(BaseModel):
     title: Optional[str] = None
     body: Optional[str] = None
     
-    
 
-    class Config:
-        from_attributes = True
+    model_config= ConfigDict(from_attributes = True)
+      
