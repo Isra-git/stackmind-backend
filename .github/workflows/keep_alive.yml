@@ -1,0 +1,17 @@
+name: StackMind Pacemaker
+
+on:
+  schedule:
+    # Se ejecuta a las 07:00 y 15:00 UTC (9:00 y 17:00 en España)
+    - cron: "0 7,15 * * *"
+  workflow_dispatch: # permite darle al botón "Run" manualmente para probar
+
+jobs:
+  ping_backend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Despertando StackMind y Supabase
+        run: |
+          # Hacemos una petición GET al endpoint de preguntas
+          # El flag -L sigue redirecciones y -i muestra las cabeceras
+          curl -L -i https://stackmind-api.onrender.com/questions
