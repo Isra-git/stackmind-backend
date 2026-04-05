@@ -24,6 +24,7 @@ class QuestionCreate(QuestionBase):
 #  devolvemos a React para mostrar
 class QuestionResponse(QuestionBase):
     id: int
+    slug: str
     views: int
     created_at: datetime
     author_id: int # Para saber quién es el dueño y dejarle puntuar las respuestas

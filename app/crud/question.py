@@ -9,20 +9,40 @@ mas recientes, buscar una pregunta por su id
 
 # dependencias
 from sqlalchemy.orm import Session
+from sqlalchemy import text
+
+import unicodedata
 import re
 
-# from sqlalchemy import func, or_
-from sqlalchemy import text
 
 from app.models.question import Question
 from app.schemas.question import QuestionCreate, QuestionUpdate
 
+# Funcion que Genera el SLUG (solo decara Url)
+def slug_generator(text: str) -> str:
+    # Eliminamos los acentos y caracteres especiales
+    text = unicodedata.normalize("NFKD", text).encode("ascii", "ignore").decode("utf-8")
+    
+    # Todo a minusculas
+    text= text.lower()
+    
+    # Eliminamos espacios y caracteres especiales (no letra o numero)
+    text= re.sub(r'[^a-z0-9]+', '-', text)
+    
+    # Eliminamos guiones al principio y al final
+    clean_text= text.strip('-')
 
+    # devolvemos el slug formateado
+    return clean_text
+    
 # Funcion que crea y guarda la pregunta del usuario
 def create_question(db: Session, question: QuestionCreate, user_id: int):
 
+    # generamos el Slug sobre el titulo
+    slug_genered= slug_generator(question.title) # llamamos a la funcion
+    
     # contenedor de la pregunta
-    db_question = Question(title=question.title, body=question.body, author_id=user_id)
+    db_question = Question(title=question.title, slug=slug_genered,body=question.body, author_id=user_id)
 
     # guardamos en la bd
     db.add(db_question)
@@ -56,7 +76,11 @@ def update_question(db: Session, db_question: Question, question_input: Question
     # scamos de Json solo los datos que el usuario ha -Enviado-
     update_data = question_input.model_dump(
         exclude_unset=True
-    )  # aqui sacamos solo lo enviado
+    )  # aqui sacamos solo lo que nos han enviado
+    
+    # si Modifica el Titulo, Modificamos el Slug
+    if "title" in update_data:
+        update_data["slug"]=slug_generator(update_data["title"])
 
     # actualizamos el objeto para la Bd campo x campo (solo los que edito)
     for key, value in update_data.items():
@@ -126,7 +150,6 @@ def search_questions(db: Session, search_query: str, skip: int = 0, limit: int =
         .limit(limit)
         .all()
     )
-    return results
-
+   
     # devolvemos la lista de  resultados de la busqueda
     return results
