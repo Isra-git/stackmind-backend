@@ -13,6 +13,8 @@ from typing import List
 from app.core.database import get_db
 from app.core.security import get_current_user
 from app.models.user import User
+from app.models.question import Question
+from app.models.answer import Answer
 from app.crud import user as crud_user
 from app.schemas.user import UserResponse, UserUpdate, UserLeaderboard
 
@@ -117,3 +119,22 @@ def ban_user(
 def get_top_users(db:Session=Depends(get_db)):
     top_users_by_rating=db.query(User).filter(User.is_active==True).order_by(User.reputation).limit(10).all()
     return top_users_by_rating
+
+# endPoint para devolver las estadisticas del perfil /me/stats
+@router.get("/me/stats")
+def get_my_profile_stats(
+    db: Session = Depends(get_db),
+    current_user: User = (get_current_user)
+):
+    # contamos las Preguntas
+    total_questions = db.query(Question).filter(Question.author_id == current_user.id).count()
+
+    # contamos las Respuestas
+    total_answers = db.query(Answer).filter(Question.author_id==current_user.id).count()
+    
+    # devolvemos las estadisticas
+    return {
+        "questions_count": total_questions,
+        "answers_count": total_answers,
+        "reputation": current_user.reputation
+    }
