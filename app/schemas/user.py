@@ -31,4 +31,4 @@ class UserLeaderboard(BaseModel):
     reputation: int
    
     model_config= ConfigDict(from_attributes = True)
-   
+

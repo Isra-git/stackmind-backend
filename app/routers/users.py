@@ -124,7 +124,7 @@ def get_top_users(db:Session=Depends(get_db)):
 @router.get("/me/stats")
 def get_my_profile_stats(
     db: Session = Depends(get_db),
-    current_user: User = (get_current_user)
+    current_user: User = Depends(get_current_user)
 ):
     # contamos las Preguntas
     total_questions = db.query(Question).filter(Question.author_id == current_user.id).count()
