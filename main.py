@@ -25,7 +25,8 @@ app = FastAPI(title="StackMind API by israDev")
 # configuracion CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], # todo -> Cambiar cuando tenga el front 
+    allow_origins=["http://localhost:5173",
+        "http://127.0.0.1:5173"], # todo -> Cambiar cuando tenga el front 
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"], # permitimos jwt
