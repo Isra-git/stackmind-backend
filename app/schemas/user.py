@@ -32,3 +32,7 @@ class UserLeaderboard(BaseModel):
    
     model_config= ConfigDict(from_attributes = True)
 
+class UserStats(BaseModel):
+    question_count: int
+    answer_count: int
+    reputation: int

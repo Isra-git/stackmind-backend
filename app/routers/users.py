@@ -16,7 +16,7 @@ from app.models.user import User
 from app.models.question import Question
 from app.models.answer import Answer
 from app.crud import user as crud_user
-from app.schemas.user import UserResponse, UserUpdate, UserLeaderboard
+from app.schemas.user import UserResponse, UserUpdate, UserLeaderboard, UserStats
 
 # creamos la instancia del router
 router= APIRouter()
@@ -121,7 +121,7 @@ def get_top_users(db:Session=Depends(get_db)):
     return top_users_by_rating
 
 # endPoint para devolver las estadisticas del perfil /me/stats
-@router.get("/me/stats")
+@router.get("/me/stats", response_model=UserStats)
 def get_my_profile_stats(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
