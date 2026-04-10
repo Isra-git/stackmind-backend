@@ -20,5 +20,8 @@ class Question(Base):
     author_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     
+    # Buscamos el User dueño de author_id para devolverlo al backend
+    author= relationship("User")
+    
     # Borrado en cascada de las Respuestas cuando se borra una Pregunta
     answers = relationship("Answer", back_populates="question", cascade="all, delete-orphan")

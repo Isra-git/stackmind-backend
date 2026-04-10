@@ -9,6 +9,13 @@ from pydantic import BaseModel, ConfigDict
 from datetime import datetime
 from typing import Optional
 
+# propiedades publicas del usuario (a devolver cuando se consulta una pregunta suya)
+class AuthorBasicInfo(BaseModel):
+    id: int
+    username: str
+    avatar_url: Optional[str] = None
+    is_admin: bool = False
+    
 #  propiedades básicas que siempre tendrá una pregunta
 class QuestionBase(BaseModel):
     title: str
@@ -28,7 +35,7 @@ class QuestionResponse(QuestionBase):
     views: int
     created_at: datetime
     author_id: int # Para saber quién es el dueño y dejarle puntuar las respuestas
-
+    author: AuthorBasicInfo # Para mostrar su nombre y avatar
 
 # esquema para el modo edicion
 class QuestionUpdate(BaseModel):
