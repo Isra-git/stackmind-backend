@@ -130,7 +130,7 @@ def get_my_profile_stats(
     total_questions = db.query(Question).filter(Question.author_id == current_user.id).count()
 
     # contamos las Respuestas
-    total_answers = db.query(Answer).filter(Question.author_id==current_user.id).count()
+    total_answers = db.query(Answer).filter(Answer.author_id==current_user.id).count()
     
     # devolvemos las estadisticas
     return {
