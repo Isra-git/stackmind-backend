@@ -173,3 +173,18 @@ def get_unanswered_questions(
         .all()
     )
     return not_answered_questions
+
+# Funcion para devolver las preguntas mas Populares (+ views) ->
+def get_top_questions(
+    db:Session,
+    skip: int = 0,
+    limit: int = 20,
+) -> List[Question]:
+    top_questions = (
+        db.query(Question)
+        .order_by(Question.views.desc())
+        .offset(skip)
+        .limit(limit)
+        .all()
+    )
+    return top_questions
