@@ -60,7 +60,7 @@ def search_questions(
 @router.get("/unanswered", response_model=List[QuestionResponse])
 def read_unanswered_questions(
   skip:int =0,
-  limit: int =0,
+  limit: int =20,
   db: Session = Depends(get_db)  
 ):
     questions=crud_question.get_unanswered_questions(
@@ -75,7 +75,7 @@ def read_unanswered_questions(
 @router.get("/top", response_model=List[QuestionResponse])
 def read_top_questions(
     skip: int =0,
-    limit: int =0,
+    limit: int =20,
     db: Session = Depends(get_db)
 ):
     questions=crud_question.get_top_questions(db=db, skip=skip, limit=limit)
