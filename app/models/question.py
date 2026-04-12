@@ -25,3 +25,8 @@ class Question(Base):
     
     # Borrado en cascada de las Respuestas cuando se borra una Pregunta
     answers = relationship("Answer", back_populates="question", cascade="all, delete-orphan")
+    
+    # usamos decorador property para devovlver el numero de respuestas de cada pregunta
+    @property
+    def answers_count(self):
+        return len(self.answers)

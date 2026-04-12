@@ -35,6 +35,7 @@ class QuestionResponse(QuestionBase):
     views: int
     created_at: datetime
     author_id: int # Para saber quién es el dueño y dejarle puntuar las respuestas
+    answers_count: int # devolvemos Cantidad de respuestas que tiene la pregunta
     author: AuthorBasicInfo # Para mostrar su nombre y avatar
 
 # esquema para el modo edicion
