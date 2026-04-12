@@ -13,36 +13,41 @@ from sqlalchemy import text
 
 import unicodedata
 import re
+from typing import List
 
 
 from app.models.question import Question
 from app.schemas.question import QuestionCreate, QuestionUpdate
 
+
 # Funcion que Genera el SLUG (solo decara Url)
 def slug_generator(text: str) -> str:
     # Eliminamos los acentos y caracteres especiales
     text = unicodedata.normalize("NFKD", text).encode("ascii", "ignore").decode("utf-8")
-    
+
     # Todo a minusculas
-    text= text.lower()
-    
+    text = text.lower()
+
     # Eliminamos espacios y caracteres especiales (no letra o numero)
-    text= re.sub(r'[^a-z0-9]+', '-', text)
-    
+    text = re.sub(r"[^a-z0-9]+", "-", text)
+
     # Eliminamos guiones al principio y al final
-    clean_text= text.strip('-')
+    clean_text = text.strip("-")
 
     # devolvemos el slug formateado
     return clean_text
-    
+
+
 # Funcion que crea y guarda la pregunta del usuario
 def create_question(db: Session, question: QuestionCreate, user_id: int):
 
     # generamos el Slug sobre el titulo
-    slug_genered= slug_generator(question.title) # llamamos a la funcion
-    
+    slug_genered = slug_generator(question.title)  # llamamos a la funcion
+
     # contenedor de la pregunta
-    db_question = Question(title=question.title, slug=slug_genered,body=question.body, author_id=user_id)
+    db_question = Question(
+        title=question.title, slug=slug_genered, body=question.body, author_id=user_id
+    )
 
     # guardamos en la bd
     db.add(db_question)
@@ -77,10 +82,10 @@ def update_question(db: Session, db_question: Question, question_input: Question
     update_data = question_input.model_dump(
         exclude_unset=True
     )  # aqui sacamos solo lo que nos han enviado
-    
+
     # si Modifica el Titulo, Modificamos el Slug
     if "title" in update_data:
-        update_data["slug"]=slug_generator(update_data["title"])
+        update_data["slug"] = slug_generator(update_data["title"])
 
     # actualizamos el objeto para la Bd campo x campo (solo los que edito)
     for key, value in update_data.items():
@@ -103,10 +108,9 @@ def delete_question(db: Session, db_question: Question):
 
 # Funcion para Buscar Preguntas , usando [Full-Text Search ] de PostreSQL en castellano
 def search_questions(db: Session, search_query: str, skip: int = 0, limit: int = 20):
-   
     """
         CONCEPTO DE FULL-TEXT SEARCH de PostgreSQL
-    
+
 
     or_ -> Or Logico -> En titulo o en Cuerpo
     to_tsvector -> transforma el texto a un vector de palabras
@@ -150,6 +154,22 @@ def search_questions(db: Session, search_query: str, skip: int = 0, limit: int =
         .limit(limit)
         .all()
     )
-   
+
     # devolvemos la lista de  resultados de la busqueda
     return results
+
+
+# Funcion para devolver las Preguntas que NO tienen Respuesta -> answers.any()
+def get_unanswered_questions(
+    db: Session,
+    skip: int = 0,
+    limit: int = 20,
+) -> List[Question]:
+    not_answered_questions = (
+        db.query(Question)
+        .filter(~Question.answers.any())
+        .offset(skip)
+        .limit(limit)
+        .all()
+    )
+    return not_answered_questions

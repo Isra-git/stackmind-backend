@@ -56,7 +56,19 @@ def search_questions(
     # devolvemos la lista de preguntas
     return questions
 
-
+# endPoint para ver las Preguntas SIN Respuesta (por encima siempre de {question_id})
+@router.get("/unanswered", response_model=List[QuestionResponse])
+def read_unanswered_questions(
+  skip:int =0,
+  limit: int =0,
+  db: Session = Depends(get_db)  
+):
+    questions=crud_question.get_unanswered_questions(
+        db=db,
+        skip=skip,
+        limit=limit
+    )
+    return questions
 
 # endPoint para ver una pregunta por su id (acceso publico)
 #    CAMBIADO DEBAJO DE /search, por orden de rutas de FastAPI (Error 422¡)
