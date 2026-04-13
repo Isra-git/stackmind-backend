@@ -1,8 +1,6 @@
 """
-
 Funciones para guardar las preguntas, listar todas , las
 mas recientes, buscar una pregunta por su id
-
 """
 
 # app/crud/question.py
@@ -59,14 +57,15 @@ def create_question(db: Session, question: QuestionCreate, user_id: int):
 
 # Funcion que lee  las preguntas: mas recientes ordenadas por create_at Desc.
 def get_questions(db: Session, skip: int = 0, limit: int = 100):
-    recent_question = (
+    total = db.query(Question).count()
+    items = (
         db.query(Question)
         .order_by(Question.created_at.desc())
         .offset(skip)
         .limit(limit)
         .all()
     )
-    return recent_question
+    return {"total": total, "items": items}
 
 
 # Funcion que busca y devuelve una pregunta por el Id
@@ -128,7 +127,7 @@ def search_questions(db: Session, search_query: str, skip: int = 0, limit: int =
 
     # Si la búsqueda se queda vacía tras limpiar, devolvemos lista vacía
     if not clean_query:
-        return []
+        return {"total": 0, "items": []}
 
     #  Convertimos "como usar preg" en "como:* & usar:* & preg:*"
     # * indica prefijo. Postgres buscará en el índice GIN lexemas que EMPIECEN por esas letras.
@@ -145,10 +144,10 @@ def search_questions(db: Session, search_query: str, skip: int = 0, limit: int =
     """)
 
     # Ejecutamos la consulta
-    results = (
-        db.query(Question)
-        .filter(sql_search)
-        .params(search_term=tsquery_string)
+    query = db.query(Question).filter(sql_search).params(search_term=tsquery_string)
+    total = query.count()
+    items = (
+        query
         .order_by(rank_expr)
         .offset(skip)
         .limit(limit)
@@ -156,7 +155,7 @@ def search_questions(db: Session, search_query: str, skip: int = 0, limit: int =
     )
 
     # devolvemos la lista de  resultados de la busqueda
-    return results
+    return {"total": total, "items": items}
 
 
 # Funcion para devolver las Preguntas que NO tienen Respuesta -> answers.any()
@@ -164,27 +163,29 @@ def get_unanswered_questions(
     db: Session,
     skip: int = 0,
     limit: int = 20,
-) -> List[Question]:
-    not_answered_questions = (
-        db.query(Question)
-        .filter(~Question.answers.any())
+):
+    query = db.query(Question).filter(~Question.answers.any())
+    total = query.count()
+    items = (
+        query
         .offset(skip)
         .limit(limit)
         .all()
     )
-    return not_answered_questions
+    return {"total": total, "items": items}
 
 # Funcion para devolver las preguntas mas Populares (+ views) ->
 def get_top_questions(
     db:Session,
     skip: int = 0,
     limit: int = 20,
-) -> List[Question]:
-    top_questions = (
+):
+    total = db.query(Question).count()
+    items = (
         db.query(Question)
         .order_by(Question.views.desc())
         .offset(skip)
         .limit(limit)
         .all()
     )
-    return top_questions
+    return {"total": total, "items": items}

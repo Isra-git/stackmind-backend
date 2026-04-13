@@ -12,7 +12,7 @@ from typing import List
 import os 
 
 from app.core.database import get_db
-from app.schemas.question import QuestionCreate, QuestionResponse, QuestionUpdate
+from app.schemas.question import QuestionCreate, QuestionResponse, QuestionUpdate, PaginatedQuestionResponse
 from app.crud import question as crud_question
 from app.core.security import get_current_user
 from app.models.user import User
@@ -36,14 +36,14 @@ def create_new_question(
 
 
 # endPoint para leer preguntas (acceso publico)
-@router.get("/", response_model=List[QuestionResponse])
+@router.get("/", response_model=PaginatedQuestionResponse)
 def read_questions(skip: int = 0, limit: int = 20, db: Session = Depends(get_db)):
     questions = crud_question.get_questions(db, skip=skip, limit=limit)
     return questions
 
 
 # endPoint para el Buscador de preguntas -No bajar la ruta "/search" ¡¡
-@router.get("/search", response_model=List[QuestionResponse])
+@router.get("/search", response_model=PaginatedQuestionResponse)
 def search_questions(
     query: str,
     skip: int =0,
@@ -57,7 +57,7 @@ def search_questions(
     return questions
 
 # endPoint para ver las Preguntas SIN Respuesta (por encima siempre de {question_id})
-@router.get("/unanswered", response_model=List[QuestionResponse])
+@router.get("/unanswered", response_model=PaginatedQuestionResponse)
 def read_unanswered_questions(
   skip:int =0,
   limit: int =20,
@@ -72,7 +72,7 @@ def read_unanswered_questions(
 
 
 # enPoint para devolver las preguntas mas Populares (+ views)
-@router.get("/top", response_model=List[QuestionResponse])
+@router.get("/top", response_model=PaginatedQuestionResponse)
 def read_top_questions(
     skip: int =0,
     limit: int =20,

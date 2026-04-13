@@ -7,7 +7,7 @@ Schemas para Preguntas
 # app/schemas/question.py
 from pydantic import BaseModel, ConfigDict
 from datetime import datetime
-from typing import Optional
+from typing import Optional, List
 
 # propiedades publicas del usuario (a devolver cuando se consulta una pregunta suya)
 class AuthorBasicInfo(BaseModel):
@@ -45,4 +45,8 @@ class QuestionUpdate(BaseModel):
     
 
     model_config= ConfigDict(from_attributes = True)
-      
+    
+# esquema para la paginacion
+class PaginatedQuestionResponse(BaseModel):
+    total: int
+    items: List[QuestionResponse]
