@@ -136,8 +136,6 @@ def delete_answer(
     crud_answer.delete_answer(db, db_answer)
 
     return None
-
-
 # endPoint para Votar una Respuesta (protegido)
 @router.post(
     "/{answer_id}/vote", response_model=AnswerResponse, status_code=status.HTTP_200_OK
@@ -148,43 +146,20 @@ def vote_answer(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    # comprobamos que la Respuesta existe
+    # Comprobamos que la Respuesta existe
     db_answer = crud_answer.get_answer(db, answer_id)
     if not db_answer:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="La Respuesta NO existe"
         )
 
-    # evitamos que vote su propia pregunta
-    if db_answer.author_id == current_user.id:
+    #  LA REGLA ESTRICTA: Solo el autor de la pregunta puede votar
+    # respuesta ->  pregunta -> a su autor
+    if db_answer.question.author_id != current_user.id:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="No puedes votar tu propia respuesta¡¡",
+            detail="Solo el creador de la pregunta original puede valorar las respuestas",
         )
 
-    # Puntuacion
-    points = 0
-    if vote.score == 1:
-        points = -1
-    elif vote.score == 2:
-        points = 1
-    elif vote.score == 3:
-        points = 3
-    elif vote.score == 4:
-        points = 7
-
-    # actualizamos Rating Respuesta
-    rate = db_answer.rating or 0
-    db_answer.rating = rate + points
-
-    # actualizamos la reputacion del Author
-    author = db.query(User).filter(User.id == db_answer.author_id).first()
-    if author:
-        current_rating = author.reputation or 0
-        author.reputation = current_rating + points
-
-    # confirmamos y guardamos
-    db.commit()
-    db.refresh(db_answer)
-
-    return db_answer
+    # Si es el autor, enviamos los puntos al CRUD para que calcule y guarde
+    return crud_answer.vote_answer(db=db, db_answer=db_answer, score=vote.score)

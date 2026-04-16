@@ -6,12 +6,12 @@ Schemas para Respuestas
 
 from pydantic import BaseModel, Field, ConfigDict
 from datetime import datetime
-from typing import Optional
+from typing import Optional, Any, Dict
 
 
 # Modelo basico
 class AnswerBase(BaseModel):
-    body: str
+    body: Dict[str,Any] # Para el JSON de la respuesta
     main_concept: Optional[str] = Field(default=None, max_length=60)
 
 
@@ -28,14 +28,14 @@ class AnswerResponse(AnswerBase):
     author_id: int
     question_id: int
 
+    # Configuración de Pydantic para manejar los campos como atributos directamente
+    model_config= ConfigDict(from_attributes = True)
 
 # Lo que enviamos y comprobamos al actualizar una pregunta
 class AnswerUpdate(AnswerBase):
-    body: Optional[str] = None
+    body: Optional[Dict[str, Any]] = None
     main_concept: Optional[str] = Field(default=None, max_length=60)
 
-    # Configuración de Pydantic para manejar los campos como atributos directamente
-    model_config= ConfigDict(from_attributes = True)
 
 # Configuracion para recibir una Votacion de una Respuesta
 class AnswerVote(BaseModel):

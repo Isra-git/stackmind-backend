@@ -79,3 +79,33 @@ def delete_answer(db:Session,db_answer: Answer):
     db.commit()
     
     return(db_answer)
+
+
+
+# Funcion que actualiza los Votos y la Reputación
+def vote_answer(db: Session, db_answer: Answer, score: int):
+    # Puntuacion
+    points = 0
+    if score == 1:
+        points = -1
+    elif score == 2:
+        points = 1
+    elif score == 3:
+        points = 3
+    elif score == 4:
+        points = 7
+
+    # actualizamos Rating Respuesta
+    rate = db_answer.rating or 0
+    db_answer.rating = rate + points
+
+    # actualizamos la reputacion del Author usando la magia de SQLAlchemy
+    if db_answer.author:
+        current_reputation = db_answer.author.reputation or 0
+        db_answer.author.reputation = current_reputation + points
+
+    # confirmamos y guardamos todo de golpe
+    db.commit()
+    db.refresh(db_answer)
+
+    return db_answer
