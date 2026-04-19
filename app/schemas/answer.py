@@ -6,18 +6,19 @@ Schemas para Respuestas
 
 from pydantic import BaseModel, Field, ConfigDict
 from datetime import datetime
-from typing import Optional, Any, Dict
+from typing import Optional, Any, Dict,List
 
 
 # Modelo basico
 class AnswerBase(BaseModel):
-    body: Dict[str,Any] # Para el JSON de la respuesta
+    # Le decimos: "body será una lista que contiene diccionarios"
+    body:List[Dict[str, Any]] # Para el JSON de la respuesta
     main_concept: Optional[str] = Field(default=None, max_length=60)
 
 
 # Lo que el usuario envía desde el formulario de React
 class AnswerCreate(AnswerBase):
-    pass
+   pass
 
 
 # Lo que enviamos a React para mostrar la pantalla
