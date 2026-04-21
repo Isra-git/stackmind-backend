@@ -16,7 +16,7 @@ from app.crud import answer as crud_answer
 from app.crud import question as crud_question
 from app.core.security import get_current_user
 from app.models.user import User
-
+from app.utils.tags_utils import generar_tags_automaticos
 
 
 # email del ADmin
@@ -47,6 +47,10 @@ def create_new_answer(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="La pregunta que intentas responder no existe",
         )
+
+    # Generamos los TAGS leyendo el array JSON de la respuesta
+    tags = generar_tags_automaticos(answer.body)
+    answer.main_concept=tags
 
     # si existe la pregunta, guardamos la respuesta
     return crud_answer.create_answer(
