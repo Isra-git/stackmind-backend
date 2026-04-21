@@ -24,6 +24,10 @@ class Answer(Base):
     author_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     question_id = Column(Integer, ForeignKey("questions.id"), nullable=False)
     
+    
+    # Buscamos el User dueño de author_id para devolverlo al backend
+    author= relationship("User")
+    
     # creamos la relacion con las Respuestas para eliminarlas cuando la pregunta sea eliminada
     question = relationship("Question", back_populates="answers")
     
