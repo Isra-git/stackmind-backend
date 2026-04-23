@@ -7,16 +7,25 @@
 import re 
 from collections import Counter
 
-# Lista de  palabras que se repiten mucho pero no aportan contexto técnico.
-STOPWORDS_ES = {
-    "el", "la", "los", "las", "un", "una", "unos", "unas", "y", "o", "pero", "si", 
-    "de", "del", "a", "al", "en", "por", "con", "para", "como", "su", "sus", "que", 
-    "es", "son", "este", "esta", "esto", "se", "lo", "te", "me", "nos", "mi", "mis", 
-    "tu", "tus", "muy", "más", "mas", "sin", "sobre", "ya", "cuando", "donde", "quien", 
-    "desde", "hasta", "paso", "ejemplo", "código", "hacer", "puedes", "tiene", "hola",
-    "gracias", "saludos", "así", "solo", "también", "hay", "todo", "nada", "bien"
-    ,"cómo", "resolver", "duda","seguro", "puede","diferencias","cómo", "resolver", "duda",
-    "què"
+# Lista Blanca  -> Solo aceptamos estas palabras como Tags
+# abarcar IA, herramientas, profesiones y negocios -> usuarios no técnicos
+ALLOWED_TAGS = {
+    # Conceptos clave de IA
+    "ia", "ai", "chatgpt", "gemini", "copilot", "claude", "midjourney", "dalle",
+    "prompt", "prompts", "bot", "asistente", "agente", "algoritmo", "tokens",
+    
+    # Casos de uso y acciones del día a día
+    "productividad", "creatividad", "automatizacion", "resumen", "traduccion",
+    "texto", "imagenes", "audio", "video", "analisis", "redaccion",
+    
+    # Herramientas y Sistemas Operativos
+    "excel", "word", "powerpoint", "notion", "canva", "windows", "mac", 
+    "linux", "android", "ios", "app", "web", "google", "microsoft","powerpoint", "excel","word", "notion", "canva", "windows", "mac", "linux", "android", "ios", "app", "web
+    
+    # Negocios, Profesiones y Sectores
+    "marketing", "ventas", "seo", "ecommerce", "pymes", "negocio", "finanzas",
+    "educacion", "profesor", "abogado", "medico", "diseño", "copywriting",
+    "programacion", "recursos-humanos", "rrhh", "estudiante", "salud", "marketing", "diseño", "copywriting", "programacion", "recursos-humanos", "rrhh", "estudiante", "salud"
 }
 
 # Analiza los bloques de StackMindEditor y devuelve max -> 3 tags clave
@@ -31,21 +40,21 @@ def generar_tags_automaticos(steps:list)-> str:
     # unimos todos los textos en una sola cadena
     texto_completo = ' '.join(textos)
     
-    # Expresion Regular -> Pasamos a Minusculas y cogemos palabras de 3+ Letras
-    # [a-záéíóúñ] asegura que cogemos palabras en español sin números ni símbolos extraños
-    palabras = re.findall(r'\b[a-záéíóúñ]{3,}\b', texto_completo.lower())
+    # Expresion Regular -> Pasamos a Minusculas y cogemos palabras
+    # [a-záéíóúñ0-9-] acepta 2+ letras, guiones y números para pillar "ia", "rrhh" o "recursos-humanos"
+    palabras = re.findall(r'\b[a-záéíóúñ0-9-]{2,}\b', texto_completo.lower())
 
-    # Filtramos las palabras de STOPWOrds
-    palabras_utiles=[palabra for palabra in palabras if palabra not in STOPWORDS_ES]
+    # Filtramos dejando SOLO las palabras que estan en la Lista Blanca
+    palabras_utiles=[palabra for palabra in palabras if palabra in ALLOWED_TAGS]
     
     # Si la respuesta no tiene Nada INteresante-> Devolvemos algo generico
     if not palabras_utiles:
-        return "solucion, comunidad, ayuda"
+        return "comunidad, ayuda, tutorial"
     
-    # Contamos la Frecuencia y sacamos las 3 mas frecuentes
+    # Contamos la Frecuencia y sacamos las 3 mas frecuentes (esto ya asegura que sean unicas)
     mas_comunes=Counter(palabras_utiles).most_common(3)
     
-    # formateamos el Resultado -> ['agente','bucle'] -> "agente, bucle"
+    # formateamos el Resultado -> ['chatgpt','marketing'] -> "chatgpt, marketing"
     tags=[palabra_format for palabra_format, cuenta in mas_comunes]
     resultado=", ".join(tags)
     
@@ -53,6 +62,6 @@ def generar_tags_automaticos(steps:list)-> str:
     return resultado[:60]
 
 # Ejemplo de uso:
-# texto = "Estoyas aprendiendo a programar y tienes dudas sobre cómo hacer un bucle. ¿Podrías ayudarme?"
-# tags = get_tags(texto)
-# print(tags) # Output: "agente, bucle"
+# texto = "Uso ChatGPT para mejorar el marketing de mi pyme y hacer diseño en Canva."
+# tags = generar_tags_automaticos([{"type": "paragraph", "content": texto}])
+# print(tags) # Output: "chatgpt, marketing, canva"
