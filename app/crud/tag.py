@@ -22,7 +22,7 @@ def get_most_used_tags(
     results=(
         db.query(
         Answer.main_concept.label("name"),
-        func.count(Answer.id).label("count")
+        func.count(Answer.id).label("counter")
     )
     .filter(Answer.main_concept.isnot(None)) # No Respuestas sin Tags
     .group_by(Answer.main_concept) # Agrupados por Repetidos
@@ -32,7 +32,7 @@ def get_most_used_tags(
     )
     
     # results devuelve una Tupla -> la convertimos en Dict
-    resultado =[{"name": row.name, "count": row.count} for row in results]
+    resultado =[{"name": row.name, "counter": row.count} for row in results]
     
     # devolvemos el resultado
     return resultado
