@@ -32,7 +32,7 @@ def get_most_used_tags(
     )
     
     # results devuelve una Tupla -> la convertimos en Dict
-    resultado =[{"name": row.name, "counter": row.count} for row in results]
+    resultado =[{"name": row.name, "counter": row.counter} for row in results]
     
     # devolvemos el resultado
     return resultado
