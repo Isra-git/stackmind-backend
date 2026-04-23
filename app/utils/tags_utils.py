@@ -15,6 +15,8 @@ STOPWORDS_ES = {
     "tu", "tus", "muy", "más", "mas", "sin", "sobre", "ya", "cuando", "donde", "quien", 
     "desde", "hasta", "paso", "ejemplo", "código", "hacer", "puedes", "tiene", "hola",
     "gracias", "saludos", "así", "solo", "también", "hay", "todo", "nada", "bien"
+    ,"cómo", "resolver", "duda","seguro", "puede","diferencias","cómo", "resolver", "duda",
+    "què"
 }
 
 # Analiza los bloques de StackMindEditor y devuelve max -> 3 tags clave
