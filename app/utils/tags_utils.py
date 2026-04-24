@@ -9,25 +9,57 @@ from collections import Counter
 
 # Lista Blanca  -> Solo aceptamos estas palabras como Tags
 # abarcar IA, herramientas, profesiones y negocios -> usuarios no técnicos
+# Lista Blanca (Whitelist) -> Solo aceptamos estas palabras como Tags
+# Lista Blanca (Whitelist) -> Solo aceptamos estas palabras como Tags
+# Mega-diccionario optimizado para StackMind (Técnicos + No Técnicos + Casos de Uso)
 ALLOWED_TAGS = {
-    # Conceptos clave de IA
-    "ia", "ai", "chatgpt", "gemini", "copilot", "claude", "midjourney", "dalle",
-    "prompt", "prompts", "bot", "asistente", "agente", "algoritmo", "tokens",
-    
-    # Casos de uso y acciones del día a día
-    "productividad", "creatividad", "automatizacion", "resumen", "traduccion",
-    "texto", "imagenes", "audio", "video", "analisis", "redaccion",
-    
-    # Herramientas y Sistemas Operativos
-    "excel", "word", "powerpoint", "notion", "canva", "windows", "mac", 
-    "linux", "android", "ios", "app", "web", "google", "microsoft","powerpoint", "excel","word", "notion", "canva", "windows", "mac", "linux", "android", "ios", "app", "web
-    
-    # Negocios, Profesiones y Sectores
-    "marketing", "ventas", "seo", "ecommerce", "pymes", "negocio", "finanzas",
-    "educacion", "profesor", "abogado", "medico", "diseño", "copywriting",
-    "programacion", "recursos-humanos", "rrhh", "estudiante", "salud", "marketing", "diseño", "copywriting", "programacion", "recursos-humanos", "rrhh", "estudiante", "salud"
-}
+    # MODELOS, EMPRESAS Y MARCAS IA
+    "ia", "ai", "chatgpt", "gpt-3", "gpt-4", "gpt-4o", "gemini", "copilot", 
+    "claude", "anthropic", "midjourney", "dalle", "stable-diffusion", 
+    "llama", "meta", "mistral", "huggingface", "perplexity", "sora", 
+    "runway", "elevenlabs", "heygen", "suno", "udio", "cursor", "openai", 
+    "google", "microsoft", "apple-intelligence",
 
+    # CONCEPTOS CLAVE DE INTELIGENCIA ARTIFICIAL (Técnicos y Divulgativos)
+    "prompt", "prompts", "prompting", "prompt-engineering", "bot", "asistente", 
+    "agente", "agentes", "algoritmo", "tokens", "llm", "nlp", "machine-learning", 
+    "deep-learning", "redes-neuronales", "dataset", "entrenamiento", "inferencia", 
+    "alucinacion", "sesgo", "fine-tuning", "rag", "contexto", "parametros", 
+    "open-source", "codigo-abierto", "agi", "api-key",
+
+    # TECNOLOGÍA, PROGRAMACIÓN Y DESPLIEGUE (Para los que se animan a programar)
+    "python", "javascript", "js", "typescript", "html", "css", "sql", "react", 
+    "angular", "vue", "node", "api", "backend", "frontend", "fullstack", 
+    "base-de-datos", "postgres", "sqlite", "mysql", "mongodb", "github", 
+    "git", "docker", "aws", "azure", "google-cloud", "render", "vercel", 
+    "supabase", "firebase", "vscode", "jupyter", "colab", "json",
+
+    #  HERRAMIENTAS DEL DÍA A DÍA, OFIMÁTICA Y NO-CODE
+    "excel", "word", "powerpoint", "office", "windows", "mac", "linux", "ios", 
+    "android", "google-docs", "sheets", "workspace", "notion", "canva", "figma", 
+    "photoshop", "premiere", "zapier", "make", "n8n", "trello", "asana", "slack", 
+    "discord", "wordpress", "shopify", "app", "web", "navegador", "extension", "plugin",
+
+    #  CASOS DE USO Y ACCIONES
+    "productividad", "creatividad", "automatizacion", "automatizar", "resumen", 
+    "traduccion", "traducir", "redaccion", "escribir", "copywriting", "texto", 
+    "imagenes", "fotografia", "audio", "musica", "video", "analisis", "datos", 
+    "analitica", "seo", "investigacion", "estudiar", "aprender", "programar", 
+    "diseño", "dibujar", "voz",
+
+    # PROFESIONES, SECTORES Y NEGOCIOS 
+    "marketing", "ventas", "ecommerce", "finanzas", "contabilidad", "educacion", 
+    "emprendedor", "pyme", "pymes", "startup", "negocio", "empresa", "profesor", 
+    "estudiante", "abogado", "medico", "ingeniero", "arquitecto", "diseñador", 
+    "programador", "desarrollador", "marketer", "ceo", "rrhh", "recursos-humanos", 
+    "periodista", "escritor", "creador-de-contenido", "youtuber", "influencer", "salud", "legal",
+
+    # DUDAS COMUNES, TROUBLESHOOTING Y CONCEPTOS DE COMUNIDAD
+    "error", "bug", "fallo", "solucion", "ayuda", "tutorial", "guia", "curso", 
+    "precio", "gratis", "premium", "suscripcion", "limite", "privacidad", 
+    "seguridad", "legalidad", "copyright", "derechos-de-autor", "alternativa", 
+    "comparativa", "cual-es-mejor", "integracion", "comunidad", "principiante", "experto"
+}
 # Analiza los bloques de StackMindEditor y devuelve max -> 3 tags clave
 def generar_tags_automaticos(steps:list)-> str:
     
