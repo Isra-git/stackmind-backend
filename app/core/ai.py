@@ -34,10 +34,10 @@ REGLAS ESTRICTAS:
 ESTRUCTURA DE SALIDA (JSON ESTRICTO):
 Debes devolver tu respuesta EXCLUSIVAMENTE en formato JSON con la siguiente estructura, sin texto adicional antes o después:
 
-{
+{{
   "analisis_interno": "Breve resumen de qué quiere lograr el usuario y su punto de partida.",
   "pregunta_optimizada": "La duda original reformulada de forma directa y clara. Sin títulos ni comillas."
-}
+}}
 
 DUDA ORIGINAL DEL USUARIO:
 {raw_text}
