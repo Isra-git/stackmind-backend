@@ -4,6 +4,7 @@
 import os
 from  groq import Groq
 from dotenv import load_dotenv
+import json 
 
 # cogemos las variables de entorno
 load_dotenv()
@@ -30,16 +31,13 @@ REGLAS ESTRICTAS:
 3. Mantén un tono amigable, directo y humano. 
 4. No añadas complejidad, requisitos de escalabilidad o detalles que el usuario no haya pedido.
 
-ESTRUCTURA DE TU RESPUESTA:
+ESTRUCTURA DE SALIDA (JSON ESTRICTO):
+Debes devolver tu respuesta EXCLUSIVAMENTE en formato JSON con la siguiente estructura, sin texto adicional antes o después:
 
-### El objetivo
-(1 o 2 frases resumiendo qué quiere lograr el usuario de forma sencilla).
-
-### Punto de partida
-(Qué materiales, archivos o situación tiene el usuario ahora mismo).
-
-### La pregunta para la comunidad
-(La duda original reformulada de forma directa y clara, lista para que un experto proponga herramientas o soluciones paso a paso).
+{
+  "analisis_interno": "Breve resumen de qué quiere lograr el usuario y su punto de partida.",
+  "pregunta_optimizada": "La duda original reformulada de forma directa y clara. Sin títulos ni comillas."
+}
 
 DUDA ORIGINAL DEL USUARIO:
 {raw_text}
@@ -54,9 +52,18 @@ DUDA ORIGINAL DEL USUARIO:
             }
         ],
         temperature=0.3, # Bajamos la temperatura para que sea más preciso y menos creativo
+        response_format={"type": "json_object"} #devolvemos Json
     )
     # formateamos la respuesta
-    response = completion.choices[0].message.content.strip()
+    response_text = completion.choices[0].message.content.strip()
     
     # devolvemos la Respuesta
-    return response
+    try:
+        response_json = json.loads(response_text)
+        
+        # Devolvemos solo la pregunta optimizada accediendo a la clave del diccionario
+        return response_json["pregunta_optimizada"]
+        
+    except json.JSONDecodeError:
+        # Por si acaso la IA falla y no devuelve un JSON válido
+        return "Error: La IA no devolvió el formato esperado."
