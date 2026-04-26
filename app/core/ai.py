@@ -1,7 +1,3 @@
-"""  
-    CONFIGURACION DE LA INTERACCION CON LA API DE GOOGLE 
-
-"""
 # /app/core/ai.py
 
 # dependencias
@@ -23,8 +19,7 @@ def enhance_text_with_AI(raw_text:str) -> str:
     # Toma un texto escrito por un usuario no técnico y lo transforma en una pregunta
     # clara, estructurada y fácil de responder por expertos en el foro StackMind.
 
-
-   prompt = f"""
+    prompt = f"""
 Eres el asistente experto de 'StackMind', un foro donde personas sin conocimientos técnicos
 preguntan sobre Inteligencia Artificial y reciben ayuda de expertos.
 
@@ -87,7 +82,7 @@ LO QUE NO DEBES HACER
 DUDA ORIGINAL DEL USUARIO:
 {raw_text}
 """
-# Uilizamos Llama 3 a través de Groq
+    # Uilizamos Llama 3 a través de Groq
     completion = client.chat.completions.create(
         model="llama-3.3-70b-versatile", # gran español
         messages=[
