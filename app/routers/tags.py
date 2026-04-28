@@ -30,6 +30,13 @@ def get_popular_tags(limit: int = 10, db: Session = Depends(get_db)):
 # enpoint para mostrar los Tags mas Nuevos
 @router.get("/recent", response_model=List[TagResponse])
 def get_recent_tags(limit: int = 12, db: Session = Depends(get_db)):
-    # Simplemente ordenamos la tabla de Tags por fecha de creación descendente
-    new_tags= crud_tag.get_latest_tags(db, limit=limit)
-    return new_tags
+    
+    # tranformamos en DIct
+    formatted_tags = []
+    for tag_name in new_tags_raw:
+        formatted_tags.append({
+            "name": tag_name,
+            "counter": 0  # 0 por defecto para que no falle la validación
+        })
+        
+    return formatted_tags
