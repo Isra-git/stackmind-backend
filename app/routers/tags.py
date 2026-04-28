@@ -31,6 +31,9 @@ def get_popular_tags(limit: int = 10, db: Session = Depends(get_db)):
 @router.get("/recent", response_model=List[TagResponse])
 def get_recent_tags(limit: int = 12, db: Session = Depends(get_db)):
     
+    # recuperamos los datos
+    new_tags_raw = crud_tag.get_latest_tags(db, limit=limit)
+    
     # tranformamos en DIct
     formatted_tags = []
     for tag_name in new_tags_raw:
