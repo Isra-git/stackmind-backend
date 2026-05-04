@@ -6,7 +6,7 @@ EndPoint Users
 
 # dependencias
 from fastapi import APIRouter, Depends, status, HTTPException
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session,joinedload
 import os
 from typing import List
 
@@ -97,9 +97,11 @@ def get_my_answers(
     db:Session=Depends(get_db),
     current_user:User=Depends(get_current_user)
 ):
-    # Filtramos las Respuesta donde el autor es el User actual
+    # Filtramos las Respuesta donde el autor es el User actual 
+    #  + JoinedLoad para añadir AnswerSnipet (mini-info de la pregunta)
     my_answers = (
         db.query(Answer)
+        .options(joinedload(Answer.question_id))
         .filter(Answer.author_id == current_user.id)
         .order_by(Answer.created_at.desc())
         .offset(skip)

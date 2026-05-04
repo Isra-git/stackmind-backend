@@ -40,9 +40,10 @@ class AnswerResponse(AnswerBase):
     # Configuración de Pydantic para manejar los campos como atributos directamente
     model_config= ConfigDict(from_attributes = True)
 
+
 # Lo que enviamos y comprobamos al actualizar una pregunta
 class AnswerUpdate(AnswerBase):
-    body: Optional[Dict[str, Any]] = None
+    body: Optional[List[Dict[str, Any]]] = None
     main_concept: Optional[str] = Field(default=None, max_length=60)
 
 
@@ -52,7 +53,20 @@ class AnswerVote(BaseModel):
         ..., ge=-1, le=4, description="Puntuacion 1-4 (muy poco,poco, util, muy util)"
     )
 
+# esquema Info Basica de una Pregunta asociada a una Resp.
+class QuestionSnippet(BaseModel):
+    title: str
+    created_at: datetime
+    
+    model_config = ConfigDict(from_attributes=True)
+
+# Enviamos info Basica sobre la pregunta a la que Pertenece cada REspuesta
+class AnswerWithQuestionResponse(AnswerResponse):
+   question: QuestionSnippet
+    
+
+
 # esquema para la paginacion 
 class PaginatedAnswerResponse(BaseModel):
     total: int
-    items: List[AnswerResponse]
+    items: List[AnswerWithQuestionResponse]
