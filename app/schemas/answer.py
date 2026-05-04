@@ -51,3 +51,8 @@ class AnswerVote(BaseModel):
     score: int = Field(
         ..., ge=-1, le=4, description="Puntuacion 1-4 (muy poco,poco, util, muy util)"
     )
+
+# esquema para la paginacion 
+class PaginatedAnswerResponse(BaseModel):
+    total: int
+    items: List[AnswerResponse]

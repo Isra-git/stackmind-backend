@@ -18,7 +18,7 @@ from app.models.answer import Answer
 from app.crud import user as crud_user
 from app.schemas.user import UserResponse, UserUpdate, UserLeaderboard, UserStats
 from app.schemas.question import PaginatedQuestionResponse
-from app.schemas.answer import AnswerResponse
+from app.schemas.answer import AnswerResponse,PaginatedAnswerResponse
 
 # creamos la instancia del router
 router = APIRouter()
@@ -78,7 +78,7 @@ def get_my_questions(
         .all()
     )
 
-    # contamos el total de respuestas
+    # contamos el total de Preguntas
     total = db.query(Question).filter(Question.author_id == current_user.id).count()
 
 
@@ -90,7 +90,7 @@ def get_my_questions(
 """ ----TODO -> Cambiar logica a Crud ----------"""
 
 # endPoint para ver Mis Respuestas en el foro
-@router.get("/me/answers", response_model=List[AnswerResponse])
+@router.get("/me/answers", response_model=PaginatedAnswerResponse)
 def get_my_answers(
     skip:int=0,
     limit:int=20,
@@ -107,7 +107,12 @@ def get_my_answers(
         .all()
     )
     
-    return my_answers
+    # contamos el total de Respuestas del Usuario
+    total=db.query(Answer).filter(Answer.author_id == current_user.id).count()
+    return {"total": total, "items": my_answers}
+
+
+
 
 # ------- endPoint para ADMIN
 # Si el correo es el del admin -> is_admin:true
