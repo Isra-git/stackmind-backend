@@ -101,7 +101,7 @@ def get_my_answers(
     #  + JoinedLoad para añadir AnswerSnipet (mini-info de la pregunta)
     my_answers = (
         db.query(Answer)
-        .options(joinedload(Answer.question_id))
+        .options(joinedload(Answer.question))
         .filter(Answer.author_id == current_user.id)
         .order_by(Answer.created_at.desc())
         .offset(skip)
