@@ -172,12 +172,22 @@ def vote_answer(
 
 
 # endPoint para devolver una Respuesta por su ID -> Para editarla
-@router.get("/answers/{answer_id}")
-def get_answer(answer_id: int, db: Session = Depends(get_db)):
-    # TODO -> Añadir al Crud
-    answer = db.query(Answer).filter(Answer.id == answer_id).first()
+@router.get(
+    "/{answer_id}", 
+    response_model=AnswerResponse, 
+    status_code=status.HTTP_200_OK
+)
+def get_answer(
+    answer_id: int, 
+    db: Session = Depends(get_db)
+):
+    # Llamamos al la funcion del Crud
+    db_answer = crud_answer.get_answer(db=db, answer_id=answer_id)
     
-    if not answer:
-        raise HTTPException(status_code=404, detail="Respuesta no encontrada")
+    if not db_answer:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, 
+            detail="Respuesta no encontrada"
+        )
         
-    return answer
+    return db_answer
