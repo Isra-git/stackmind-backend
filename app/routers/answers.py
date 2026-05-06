@@ -16,6 +16,7 @@ from app.crud import answer as crud_answer
 from app.crud import question as crud_question
 from app.core.security import get_current_user
 from app.models.user import User
+from app.models.answer import Answer
 from app.utils.tags_utils import generar_tags_automaticos
 
 
@@ -167,3 +168,16 @@ def vote_answer(
 
     # Si es el autor, enviamos los puntos al CRUD para que calcule y guarde
     return crud_answer.vote_answer(db=db, db_answer=db_answer, score=vote.score)
+
+
+
+# endPoint para devolver una Respuesta por su ID -> Para editarla
+@router.get("/answers/{answer_id}")
+def get_answer(answer_id: int, db: Session = Depends(get_db)):
+    # TODO -> Añadir al Crud
+    answer = db.query(Answer).filter(Answer.id == answer_id).first()
+    
+    if not answer:
+        raise HTTPException(status_code=404, detail="Respuesta no encontrada")
+        
+    return answer
