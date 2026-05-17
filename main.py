@@ -23,16 +23,19 @@ Base.metadata.create_all(bind=engine)
 # Creamos la instancia de FastAPI
 app = FastAPI(title="StackMind API by israDev")
 
-# configuracion CORS
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["http://localhost:5173",
+# Conexiones Permitidas en CORS
+origins=["http://localhost:5173",
     "http://127.0.0.1:5173",
     "https://localhost:5173",
     "http://localhost:5174", # evita problemas cuando el puerto esta ocupado
         "http://127.0.0.1:5174",
         "https://stackmind-api.onrender.com",
-    ], # todo -> Cambiar cuando tenga el front 
+        "https://stackmind-tau.vercel.app/",
+    ]
+# configuracion CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins, # Front en Vercel 
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"], # permitimos jwt
