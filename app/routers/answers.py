@@ -142,7 +142,7 @@ def delete_answer(
 
     return None
 # endPoint para Votar una Respuesta (protegido)
-@router.post(
+@router.put(
     "/{answer_id}/vote", response_model=AnswerResponse, status_code=status.HTTP_200_OK
 )
 def vote_answer(
