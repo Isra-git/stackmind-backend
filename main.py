@@ -30,7 +30,7 @@ origins=["http://localhost:5173",
     "http://localhost:5174", # evita problemas cuando el puerto esta ocupado
         "http://127.0.0.1:5174",
         "https://stackmind-api.onrender.com",
-        "https://stackmind-tau.vercel.app/",
+        "https://stackmind-tau.vercel.app",
     ]
 # configuracion CORS
 app.add_middleware(
