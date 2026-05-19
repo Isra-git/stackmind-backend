@@ -207,3 +207,34 @@ def get_my_profile_stats(
         "answers_count": total_answers,
         "reputation": current_user.reputation,
     }
+
+# endPoint para devolver las estadisticas de un perfil publico /users/{user_id}/stats
+@router.get("/{user_id}/stats", response_model=UserStats)
+def get_user_profile_stats(
+    user_id: int,
+    db: Session = Depends(get_db), 
+    # verificamos su token),
+    
+    current_user: User = Depends(get_current_user)
+):
+    #  verificamos que el usuario que intentan visitar  exista
+    visited_user = db.query(User).filter(User.id == user_id).first()
+    if not visited_user:
+        raise HTTPException(status_code=404, detail="Usuario no encontrado")
+
+    # Contamos las Preguntas del usuario VISITADO (user_id)
+    total_questions = (
+        db.query(Question).filter(Question.author_id == user_id).count()
+    )
+
+    #  Contamos las Respuestas del usuario VISITADO (user_id)
+    total_answers = (
+        db.query(Answer).filter(Answer.author_id == user_id).count()
+    )
+
+    #  Devolvemos las estadisticas -> Publicas
+    return {
+        "questions_count": total_questions,
+        "answers_count": total_answers,
+        "reputation": visited_user.reputation,
+    }
