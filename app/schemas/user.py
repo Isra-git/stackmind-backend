@@ -29,7 +29,7 @@ class UserLeaderboard(BaseModel):
     username: str
     avatar_url: Optional[str]= None
     reputation: int
-   
+    id: int
     model_config= ConfigDict(from_attributes = True)
 
 class UserStats(BaseModel):
