@@ -238,3 +238,10 @@ def get_user_profile_stats(
         "answers_count": total_answers,
         "reputation": visited_user.reputation,
     }
+# endPoint para devolver los datos Basicos de un usuario
+@router.get("/{user_id}", response_model=UserResponse)
+def get_user_profile(user_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    user = db.query(User).filter(User.id == user_id, User.is_active).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="Usuario no encontrado")
+    return user
