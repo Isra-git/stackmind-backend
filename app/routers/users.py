@@ -125,7 +125,7 @@ ADMIN_EMAIL = os.getenv("ADMIN_EMAIL", "admin@stackmind.com")
 @router.get("/admin/list", response_model=List[UserResponse])
 def get_admin_users_list(
     skip: int = 0,
-    limit: int = 0,
+    limit: int = 50,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
@@ -138,6 +138,10 @@ def get_admin_users_list(
 
     # generamos la lista de usuarios y la devolvemos
     users_list = crud_user.get_users(db=db, skip=skip, limit=limit)
+    
+    # mostramos el administrador
+    for user in users_list:
+        user.is_admin = (user.email == ADMIN_EMAIL)
     return users_list
 
 
